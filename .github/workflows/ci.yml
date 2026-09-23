@@ -15,6 +15,7 @@ jobs:
     timeout-minutes: 60
     env:
       DATABASE_URL: postgresql://tanim:tanim@localhost:5432/tanim
+      TANIM_TEST_DATABASE_URL: postgresql://tanim:tanim@localhost:5432/tanim
     services:
       postgres:
         image: postgres:16
@@ -72,6 +73,9 @@ jobs:
 
       - name: Smoke test API health behavior
         run: npm run smoke:api
+
+      - name: Smoke test POST /risk/check
+        run: npm run smoke:risk
 
       - name: Apply PostgreSQL migrations and seed data
         run: npm run data:seed
