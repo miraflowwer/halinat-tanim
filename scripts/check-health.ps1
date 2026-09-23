@@ -5,12 +5,12 @@ param(
 $ErrorActionPreference = "SilentlyContinue"
 
 $targets = @(
-    @{ Name = "Landing"; Url = "http://127.0.0.1:3000/" },
-    @{ Name = "Authentication"; Url = "http://127.0.0.1:3001/" },
-    @{ Name = "Platform"; Url = "http://127.0.0.1:3002/" },
-    @{ Name = "Documentation"; Url = "http://127.0.0.1:3003/" },
-    @{ Name = "API"; Url = "http://127.0.0.1:8000/health" },
-    @{ Name = "Database"; Url = "http://127.0.0.1:8000/health/db" }
+    @{ Name = "Landing"; Url = "http://127.0.0.1:3000/"; Kind = "web" },
+    @{ Name = "Authentication"; Url = "http://127.0.0.1:3001/"; Kind = "web" },
+    @{ Name = "Platform"; Url = "http://127.0.0.1:3002/"; Kind = "web" },
+    @{ Name = "Documentation"; Url = "http://127.0.0.1:3003/"; Kind = "web" },
+    @{ Name = "API"; Url = "http://127.0.0.1:8000/health"; Kind = "api" },
+    @{ Name = "Database"; Url = "http://127.0.0.1:8000/health/db"; Kind = "database" }
 )
 
 $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
@@ -25,7 +25,16 @@ while ((Get-Date) -lt $deadline -and $remaining.Count -gt 0) {
         $url = $remaining[$name]
         try {
             $response = Invoke-WebRequest -Uri $url -UseBasicParsing -TimeoutSec 3
-            if ($response.StatusCode -ge 200 -and $response.StatusCode -lt 400) {
+            $healthy = $response.StatusCode -ge 200 -and $response.StatusCode -lt 300
+            $kind = ($targets | Where-Object { $_.Name -eq $name } | Select-Object -First 1).Kind
+
+            if ($healthy -and $kind -in @("api", "database")) {
+                $body = $response.Content | ConvertFrom-Json
+                $healthy = $body.status -eq "healthy"
+                if ($kind -eq "database") { $healthy = $healthy -and $body.database -eq "reachable" }
+            }
+
+            if ($healthy) {
                 Write-Host "[OK] $name"
                 $remaining.Remove($name)
             }

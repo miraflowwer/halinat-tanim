@@ -3,7 +3,8 @@ setlocal
 cd /d "%~dp0"
 
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\stop-tanim.ps1"
+set "EXIT_CODE=%ERRORLEVEL%"
 
 echo.
 pause
-exit /b 0
+exit /b %EXIT_CODE%

@@ -1,0 +1,50 @@
+:root {
+  font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  color: #172018;
+  background: #fff;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+}
+
+main {
+  box-sizing: border-box;
+  width: min(100%, 72rem);
+  min-height: 100vh;
+  margin-inline: auto;
+  padding: clamp(1rem, 5vw, 3rem);
+}
+
+h1 {
+  max-width: 22ch;
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+p {
+  max-width: 65ch;
+}
+
+label,
+select {
+  display: block;
+}
+
+select {
+  min-height: 2.75rem;
+  max-width: 100%;
+  margin-top: 0.35rem;
+  padding-inline: 0.5rem;
+}
+
+:focus-visible {
+  outline: 3px solid #185c39;
+  outline-offset: 3px;
+}

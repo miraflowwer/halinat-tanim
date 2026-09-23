@@ -1,0 +1,17 @@
+{
+  "name": "@tanim/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./style.css": "./src/placeholder.css"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "dependencies": {
+    "@tanim/i18n": "*",
+    "@tanim/types": "*"
+  }
+}
