@@ -10,12 +10,12 @@ The geography registry covers Luzon. It has 8 regions, 38 provinces, and 771 cit
 
 ## Dataset version and generation
 
-`data/dataset_config.json` is the one source for the dataset version, fixed seed, time periods, and demo snapshot thresholds. The current version is `demo-2026-09-v2` with seed `20260924`.
+`data/dataset_config.json` is the one source for the dataset version, fixed seed, time periods, and demo snapshot thresholds. The current version is `demo-2026-09-v3` with seed `20260924`.
 
 The time contract has two parts:
 
 - Current supply context is 2026-09-01 through 2026-09-30. It is used for the current supply map.
-- Future planning periods are the complete quarterly horizon from 2027-01-01 through 2028-12-31. Phase 3 can use only those configured quarters. A date outside this horizon is unsupported and must be reported as such.
+- Future planning periods are the complete quarterly horizon from 2026-10-01 through 2028-12-31. This includes October through December 2026 and all eight quarters in 2027 and 2028. A date outside this horizon is unsupported and must be reported as such.
 
 Run the generator with:
 
@@ -23,20 +23,20 @@ Run the generator with:
 python scripts/generate_demo_data.py
 ```
 
-The generator writes files under the folder named by `dataset_version` in `data/dataset_config.json`. It uses stable SHA-256 based values and stable sorting. It does not use Python's randomized `hash()` function. If the same version already exists with the same content, it reports that the data match. If that version exists with different content, the command stops. Use a new dataset version for changed inputs or methods. `--replace` is available for a deliberate replacement of the current generated files.
+The generator writes files under the folder named by `dataset_version` in `data/dataset_config.json`. It uses stable SHA-256 based values, stable sorting, and deterministic gzip output. It does not use Python's randomized `hash()` function. If the same version already exists with the same content, it reports that the data match. If that version exists with different content, the command stops. Use a new dataset version for changed inputs or methods. `--replace` is available for a deliberate replacement of the current generated files.
 
 The output files are:
 
-- `crop_profiles.csv`
-- `price_history.csv`
-- `crop_references.csv`
-- `supply_snapshots.csv`
-- `soil_suitability.csv`
+- `crop_profiles.csv.gz`
+- `price_history.csv.gz`
+- `crop_references.csv.gz`
+- `supply_snapshots.csv.gz`
+- `soil_suitability.csv.gz`
 - `metadata.json`
 
 All synthetic prices use PHP/kg. All reference and planned areas use hectares. Prices have 36 monthly records per active crop and province, plus NCR. Reference and snapshot records cover each active crop and supported municipality or city for the current period and every future planning quarter. Suitability records cover each active crop and supported municipality or city.
 
-Current supply context and future planned supply are separate concepts. `supply_snapshots.csv` rows marked `current_supply` are map context. Rows marked `future_planning` are synthetic future context for later planning work. Neither dataset silently creates `planting_plans` records. The two demo fixtures in `data/seeds/demo_scenarios.json` are future planning fixtures and preserve the Tomato and Eggplant examples.
+Current supply context and future planned supply are separate concepts. `supply_snapshots.csv.gz` rows marked `current_supply` are map context. Rows marked `future_planning` are synthetic future context for later planning work. Neither dataset silently creates `planting_plans` records. The two demo fixtures in `data/seeds/demo_scenarios.json` are future planning fixtures and preserve the Tomato and Eggplant examples.
 
 ## Snapshot labels
 

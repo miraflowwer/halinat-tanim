@@ -9,6 +9,7 @@ from scripts.data_common import (
     DEFAULT_CROP_SCOPE,
     current_supply_period,
     quarter_periods,
+    read_csv_rows,
     sha256_file,
     supply_periods,
     supported_future_period,
@@ -239,9 +240,8 @@ def test_validation_rejects_a_modified_generated_file(tmp_path):
     generated = generate_dataset(
         crops, geographies, config, tmp_path / "dataset", scenarios_path=None
     )
-    prices_path = generated["path"] / "price_history.csv"
-    with prices_path.open(encoding="utf-8", newline="") as file:
-        rows = list(csv.DictReader(file))
+    prices_path = generated["path"] / "price_history.csv.gz"
+    rows = read_csv_rows(prices_path)
     rows[0]["price_php_per_kg"] = "-1"
     write_csv_rows(
         prices_path,
@@ -319,11 +319,11 @@ def test_seeder_skips_a_matching_dataset_version_without_writes(tmp_path):
         "data_kind": "synthetic_demo",
         "seed": 7,
         "files": {
-            "crop_profiles.csv": {"row_count": 1},
-            "price_history.csv": {"row_count": 2},
-            "crop_references.csv": {"row_count": 1},
-            "supply_snapshots.csv": {"row_count": 1},
-            "soil_suitability.csv": {"row_count": 1},
+            "crop_profiles.csv.gz": {"row_count": 1},
+            "price_history.csv.gz": {"row_count": 2},
+            "crop_references.csv.gz": {"row_count": 1},
+            "supply_snapshots.csv.gz": {"row_count": 1},
+            "soil_suitability.csv.gz": {"row_count": 1},
         },
     }
     dataset_dir = tmp_path / "dataset"
@@ -352,11 +352,11 @@ def test_seeder_rejects_an_incomplete_existing_version(tmp_path):
         "data_kind": "synthetic_demo",
         "seed": 7,
         "files": {
-            "crop_profiles.csv": {"row_count": 1},
-            "price_history.csv": {"row_count": 2},
-            "crop_references.csv": {"row_count": 1},
-            "supply_snapshots.csv": {"row_count": 1},
-            "soil_suitability.csv": {"row_count": 1},
+            "crop_profiles.csv.gz": {"row_count": 1},
+            "price_history.csv.gz": {"row_count": 2},
+            "crop_references.csv.gz": {"row_count": 1},
+            "supply_snapshots.csv.gz": {"row_count": 1},
+            "soil_suitability.csv.gz": {"row_count": 1},
         },
     }
     dataset_dir = tmp_path / "dataset"
@@ -384,11 +384,11 @@ def test_seeder_rejects_same_count_modified_content(tmp_path):
         "data_kind": "synthetic_demo",
         "seed": 7,
         "files": {
-            "crop_profiles.csv": {"row_count": 1},
-            "price_history.csv": {"row_count": 2},
-            "crop_references.csv": {"row_count": 1},
-            "supply_snapshots.csv": {"row_count": 1},
-            "soil_suitability.csv": {"row_count": 1},
+            "crop_profiles.csv.gz": {"row_count": 1},
+            "price_history.csv.gz": {"row_count": 2},
+            "crop_references.csv.gz": {"row_count": 1},
+            "supply_snapshots.csv.gz": {"row_count": 1},
+            "soil_suitability.csv.gz": {"row_count": 1},
         },
     }
     dataset_dir = tmp_path / "dataset"
@@ -441,27 +441,41 @@ def test_crop_scope_inventory_matches_registry():
     assert errors == []
     assert scope_ids == {row["crop_id"] for row in crops if row["active"] == "true"}
     assert len(scope_rows) > len(scope_ids)
+    in_scope = {
+        row["scope_id"]: row
+        for row in scope_rows
+        if row["in_scope"].strip().lower() == "true"
+    }
+    assert {
+        "white_potato",
+        "chayote",
+        "celery",
+        "kangkong",
+        "radish",
+        "habichuelas",
+        "patola",
+    } <= set(in_scope)
+    for crop_id in ("white_potato", "chayote", "celery"):
+        assert "DA-AMAS-PM-2026-02-25" in in_scope[crop_id]["source_references"].split("|")
+    for crop_id in ("kangkong", "radish", "habichuelas", "patola"):
+        assert "PSA-QUEZON-VRC-2025" in in_scope[crop_id]["source_references"].split("|")
 
 
 def test_time_contract_has_current_period_and_identifies_unsupported_dates():
     config = json.loads(Path("data/dataset_config.json").read_text(encoding="utf-8"))
     assert current_supply_period(config) == ("2026-09-01", "2026-09-30")
-    assert len(supply_periods(config)) == 9
+    assert len(supply_periods(config)) == 10
+    assert supported_future_period(config, "2026-10-01", "2026-12-31")
     assert supported_future_period(config, "2027-01-01", "2027-03-31")
     assert not supported_future_period(config, "2029-01-01", "2029-03-31")
 
 
 def test_generated_provenance_keeps_price_and_suitability_purposes_separate():
-    generated = Path("data/generated/demo-2026-09-v2")
-    prices = list(
-        csv.DictReader((generated / "price_history.csv").open(encoding="utf-8", newline=""))
-    )
-    references = list(
-        csv.DictReader((generated / "crop_references.csv").open(encoding="utf-8", newline=""))
-    )
-    soil = list(
-        csv.DictReader((generated / "soil_suitability.csv").open(encoding="utf-8", newline=""))
-    )
+    config = json.loads(Path("data/dataset_config.json").read_text(encoding="utf-8"))
+    generated = Path("data/generated") / config["dataset_version"]
+    prices = read_csv_rows(generated / "price_history.csv.gz")
+    references = read_csv_rows(generated / "crop_references.csv.gz")
+    soil = read_csv_rows(generated / "soil_suitability.csv.gz")
     assert set(prices[0]["reference_sources"].split("|")) == {
         "PSA-OPENSTAT-2M4AFN08",
         "DA-PRICE-MONITORING",
@@ -473,18 +487,20 @@ def test_generated_provenance_keeps_price_and_suitability_purposes_separate():
 
 
 def test_generated_supply_periods_and_profiles_are_auditable():
-    generated = Path("data/generated/demo-2026-09-v2")
-    snapshots = list(
-        csv.DictReader(
-            (generated / "supply_snapshots.csv").open(encoding="utf-8", newline="")
-        )
-    )
-    profiles = list(
-        csv.DictReader((generated / "crop_profiles.csv").open(encoding="utf-8", newline=""))
-    )
+    config = json.loads(Path("data/dataset_config.json").read_text(encoding="utf-8"))
+    generated = Path("data/generated") / config["dataset_version"]
+    scope_rows = read_csv_rows(DEFAULT_CROP_SCOPE)
+    expected_crop_ids = {
+        row["scope_id"] for row in scope_rows if row["in_scope"].strip().lower() == "true"
+    }
+    snapshots = read_csv_rows(generated / "supply_snapshots.csv.gz")
+    profiles = read_csv_rows(generated / "crop_profiles.csv.gz")
+    current_snapshots = [row for row in snapshots if row["period_kind"] == "current_supply"]
     assert {row["period_kind"] for row in snapshots} == {"current_supply", "future_planning"}
-    assert sum(row["period_kind"] == "current_supply" for row in snapshots) == 35 * 771
-    assert len({row["summary_en"] for row in profiles}) == 35
+    assert len(current_snapshots) == len(expected_crop_ids) * 771
+    assert {row["crop_id"] for row in current_snapshots} == expected_crop_ids
+    assert {row["crop_id"] for row in profiles} == expected_crop_ids
+    assert len({row["summary_en"] for row in profiles}) == len(expected_crop_ids)
     assert len({row["growing_conditions_en"] for row in profiles}) >= 20
 
 
@@ -492,8 +508,8 @@ def test_suitability_generation_is_repeatable(tmp_path):
     crops, geographies, config = _write_minimal_inputs(tmp_path)
     first = generate_dataset(crops, geographies, config, tmp_path / "first", scenarios_path=None)
     second = generate_dataset(crops, geographies, config, tmp_path / "second", scenarios_path=None)
-    assert (first["path"] / "soil_suitability.csv").read_bytes() == (
-        second["path"] / "soil_suitability.csv"
+    assert (first["path"] / "soil_suitability.csv.gz").read_bytes() == (
+        second["path"] / "soil_suitability.csv.gz"
     ).read_bytes()
 
 
@@ -502,8 +518,8 @@ def test_validator_rejects_malformed_provenance(tmp_path):
     generated = generate_dataset(
         crops, geographies, config, tmp_path / "dataset", scenarios_path=None
     )
-    soil_path = generated["path"] / "soil_suitability.csv"
-    rows = list(csv.DictReader(soil_path.open(encoding="utf-8", newline="")))
+    soil_path = generated["path"] / "soil_suitability.csv.gz"
+    rows = read_csv_rows(soil_path)
     rows[0]["reference_sources"] = "PSA-OPENSTAT-2M4AFN08"
     write_csv_rows(soil_path, list(rows[0]), rows)
     errors, _ = validate_dataset(crops, geographies, config, generated["path"], scenarios_path=None)

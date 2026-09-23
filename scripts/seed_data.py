@@ -268,11 +268,11 @@ def _version_exists(
                     "Create a new dataset_version instead of replacing it."
                 )
             expected_tables = {
-                "crop_profiles": "crop_profiles.csv",
-                "price_history": "price_history.csv",
-                "crop_references": "crop_references.csv",
-                "supply_snapshots": "supply_snapshots.csv",
-                "soil_suitability": "soil_suitability.csv",
+                "crop_profiles": "crop_profiles.csv.gz",
+                "price_history": "price_history.csv.gz",
+                "crop_references": "crop_references.csv.gz",
+                "supply_snapshots": "supply_snapshots.csv.gz",
+                "soil_suitability": "soil_suitability.csv.gz",
             }
             for table, filename in expected_tables.items():
                 expected_count = metadata["files"][filename]["row_count"]
@@ -359,7 +359,7 @@ def _seed_version(
         ),
     )
 
-    profiles = read_csv_rows(dataset_dir / "crop_profiles.csv")
+    profiles = read_csv_rows(dataset_dir / "crop_profiles.csv.gz")
     profile_statement = """
         INSERT INTO crop_profiles (
             crop_id, dataset_version, summary_en, summary_tl,
@@ -388,7 +388,7 @@ def _seed_version(
         ),
     )
 
-    prices = read_csv_rows(dataset_dir / "price_history.csv")
+    prices = read_csv_rows(dataset_dir / "price_history.csv.gz")
     price_statement = """
         INSERT INTO price_history (
             crop_id, geography_id, price_date, price_php_per_kg, currency, price_unit,
@@ -414,7 +414,7 @@ def _seed_version(
         ),
     )
 
-    references = read_csv_rows(dataset_dir / "crop_references.csv")
+    references = read_csv_rows(dataset_dir / "crop_references.csv.gz")
     reference_statement = """
         INSERT INTO crop_references (
             crop_id, geography_id, period_start, period_end, period_kind, reference_area_ha,
@@ -442,7 +442,7 @@ def _seed_version(
         ),
     )
 
-    snapshots = read_csv_rows(dataset_dir / "supply_snapshots.csv")
+    snapshots = read_csv_rows(dataset_dir / "supply_snapshots.csv.gz")
     snapshot_statement = """
         INSERT INTO supply_snapshots (
             crop_id, geography_id, period_start, period_end, period_kind, planned_area_ha,
@@ -474,7 +474,7 @@ def _seed_version(
         ),
     )
 
-    suitability = read_csv_rows(dataset_dir / "soil_suitability.csv")
+    suitability = read_csv_rows(dataset_dir / "soil_suitability.csv.gz")
     suitability_statement = """
         INSERT INTO soil_suitability (
             crop_id, geography_id, suitability_class, data_kind, dataset_version,

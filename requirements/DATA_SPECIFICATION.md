@@ -164,7 +164,7 @@ Provenance must still be available through metadata and documentation.
 
 Use a readable dataset version such as:
 
-`demo-2026-09-v2`
+`demo-2026-09-v3`
 
 When data meaning, generation logic, or a major input changes, create a new version.
 

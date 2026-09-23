@@ -635,12 +635,12 @@ def _write_dataset(
     output_dir.mkdir(parents=True, exist_ok=True)
 
     files: dict[str, dict[str, Any]] = {}
-    profiles_path = output_dir / "crop_profiles.csv"
+    profiles_path = output_dir / "crop_profiles.csv.gz"
     files[profiles_path.name] = {
         "row_count": write_csv_rows(profiles_path, PROFILE_FIELDS, _profile_rows(crops, version)),
         "sha256": sha256_file(profiles_path),
     }
-    prices_path = output_dir / "price_history.csv"
+    prices_path = output_dir / "price_history.csv.gz"
     files[prices_path.name] = {
         "row_count": write_csv_rows(
             prices_path, PRICE_FIELDS, _price_rows(crops, markets, months, seed, version)
@@ -651,17 +651,17 @@ def _write_dataset(
     references, snapshots = _reference_and_snapshot_rows(
         crops, municipalities, periods, overrides, seed, version, thresholds
     )
-    reference_path = output_dir / "crop_references.csv"
+    reference_path = output_dir / "crop_references.csv.gz"
     files[reference_path.name] = {
         "row_count": write_csv_rows(reference_path, REFERENCE_FIELDS, references),
         "sha256": sha256_file(reference_path),
     }
-    snapshot_path = output_dir / "supply_snapshots.csv"
+    snapshot_path = output_dir / "supply_snapshots.csv.gz"
     files[snapshot_path.name] = {
         "row_count": write_csv_rows(snapshot_path, SNAPSHOT_FIELDS, snapshots),
         "sha256": sha256_file(snapshot_path),
     }
-    suitability_path = output_dir / "soil_suitability.csv"
+    suitability_path = output_dir / "soil_suitability.csv.gz"
     files[suitability_path.name] = {
         "row_count": write_csv_rows(
             suitability_path,
@@ -745,7 +745,10 @@ def _write_dataset(
         "reference_sources": [
             "PSGC-Q2-2026",
             "PSA-OPENSTAT-2M4AFN08",
+            "PSA-QUEZON-CRPS-2022",
+            "PSA-QUEZON-VRC-2025",
             "DA-PRICE-MONITORING",
+            "DA-AMAS-PM-2026-02-25",
             "Kew-Plants-of-the-World-Online",
             *PROVENANCE_IDS.values(),
         ],

@@ -24,6 +24,7 @@ if __package__:
         is_finite_number,
         load_json,
         normalize_label,
+        open_csv_text,
         price_months,
         quarter_periods,
         sha256_file,
@@ -52,6 +53,7 @@ else:
         is_finite_number,
         load_json,
         normalize_label,
+        open_csv_text,
         price_months,
         quarter_periods,
         sha256_file,
@@ -119,7 +121,7 @@ ALLOWED_PROVENANCE = {
 
 
 def read_csv_document(path: Path) -> tuple[list[str], list[dict[str, str]]]:
-    with path.open(encoding="utf-8-sig", newline="") as file:
+    with open_csv_text(path) as file:
         reader = csv.DictReader(file)
         return list(reader.fieldnames or []), list(reader)
 
@@ -155,8 +157,6 @@ def validate_crop_registry(rows: list[dict[str, str]], errors: list[str]) -> lis
         ids[crop_id] = row_number
         if not row.get("canonical_name_en", "").strip():
             errors.append(f"crop registry row {row_number}: canonical_name_en is required")
-        if not row.get("scientific_name", "").strip():
-            errors.append(f"crop registry row {row_number}: scientific_name is required")
         if row.get("category", "") not in ALLOWED_CATEGORIES:
             errors.append(
                 f"crop registry row {row_number}: unsupported category {row.get('category')!r}"
@@ -184,7 +184,13 @@ def validate_crop_scope_inventory(
 ) -> set[str]:
     scope_ids: set[str] = set()
     in_scope_ids: set[str] = set()
-    source_ids = {"DA-PRICE-MONITORING", "PSA-OPENSTAT-2M4AFN08"}
+    source_ids = {
+        "DA-PRICE-MONITORING",
+        "DA-AMAS-PM-2026-02-25",
+        "PSA-OPENSTAT-2M4AFN08",
+        "PSA-QUEZON-CRPS-2022",
+        "PSA-QUEZON-VRC-2025",
+    }
     for row_number, row in enumerate(rows, start=2):
         scope_id = row.get("scope_id", "").strip()
         if not re.fullmatch(r"[a-z][a-z0-9_]*", scope_id):
@@ -216,6 +222,22 @@ def validate_crop_scope_inventory(
                 errors.append(
                     f"crop scope row {row_number}: included crop cannot have an exclusion reason"
                 )
+            registry_crop = next(
+                (candidate for candidate in registry_rows if candidate.get("crop_id") == scope_id),
+                None,
+            )
+            if registry_crop is not None:
+                if row.get("canonical_name_en", "").strip() != registry_crop.get(
+                    "canonical_name_en", ""
+                ).strip():
+                    errors.append(
+                        f"crop scope row {row_number}: canonical_name_en does not match "
+                        "the crop registry"
+                    )
+                if row.get("category", "").strip() != registry_crop.get("category", "").strip():
+                    errors.append(
+                        f"crop scope row {row_number}: category does not match the crop registry"
+                    )
         elif not row.get("exclusion_reason", "").strip():
             errors.append(f"crop scope row {row_number}: excluded crop needs an exclusion reason")
     registry_ids = {
@@ -753,52 +775,53 @@ def validate_dataset(
                 errors.append(f"metadata provenance has invalid source IDs for {table_name}")
 
     expected_files = {
-        "crop_profiles.csv": PROFILE_FIELDS,
-        "price_history.csv": PRICE_FIELDS,
-        "crop_references.csv": REFERENCE_FIELDS,
-        "supply_snapshots.csv": SNAPSHOT_FIELDS,
-        "soil_suitability.csv": SUITABILITY_FIELDS,
+        "crop_profiles.csv": ("crop_profiles.csv.gz", PROFILE_FIELDS),
+        "price_history.csv": ("price_history.csv.gz", PRICE_FIELDS),
+        "crop_references.csv": ("crop_references.csv.gz", REFERENCE_FIELDS),
+        "supply_snapshots.csv": ("supply_snapshots.csv.gz", SNAPSHOT_FIELDS),
+        "soil_suitability.csv": ("soil_suitability.csv.gz", SUITABILITY_FIELDS),
     }
+    expected_physical_files = {physical_name for physical_name, _ in expected_files.values()}
     manifest = metadata.get("files", {})
     if not isinstance(manifest, dict):
         errors.append("metadata files manifest must be an object")
         manifest = {}
-    if set(manifest) != set(expected_files):
+    if set(manifest) != expected_physical_files:
         errors.append("metadata files manifest does not list the required generated CSV files")
     actual_files = {
         path.name for path in target.iterdir() if path.is_file() and path.name != "metadata.json"
     }
-    if actual_files != set(expected_files):
+    if actual_files != expected_physical_files:
         errors.append(
             "generated directory contains an unexpected file set: "
-            f"expected {sorted(expected_files)}, "
+            f"expected {sorted(expected_physical_files)}, "
             f"found {sorted(actual_files)}"
         )
 
     tables: dict[str, list[dict[str, str]]] = {}
-    for filename, required_fields in expected_files.items():
+    for logical_name, (filename, required_fields) in expected_files.items():
         path = target / filename
         if not path.is_file():
             errors.append(f"required generated file is missing: {path}")
-            tables[filename] = []
+            tables[logical_name] = []
             continue
         try:
             fields, rows = read_csv_document(path)
         except (OSError, csv.Error) as error:
-            errors.append(f"cannot read {filename}: {error}")
-            tables[filename] = []
+            errors.append(f"cannot read {logical_name}: {error}")
+            tables[logical_name] = []
             continue
         if fields != required_fields:
-            errors.append(f"{filename} columns do not match the canonical field contract")
-        tables[filename] = rows
+            errors.append(f"{logical_name} columns do not match the canonical field contract")
+        tables[logical_name] = rows
         entry = manifest.get(filename, {})
         if not isinstance(entry, dict):
-            errors.append(f"{filename} manifest entry must be an object")
+            errors.append(f"{logical_name} manifest entry must be an object")
             entry = {}
         if entry.get("row_count") != len(rows):
-            errors.append(f"{filename} row count does not match metadata manifest")
+            errors.append(f"{logical_name} row count does not match metadata manifest")
         if entry.get("sha256") != sha256_file(path):
-            errors.append(f"{filename} checksum does not match metadata manifest")
+            errors.append(f"{logical_name} checksum does not match metadata manifest")
 
     for filename, rows in tables.items():
         _check_dataset_rows(

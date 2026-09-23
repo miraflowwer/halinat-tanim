@@ -2,7 +2,9 @@
 
 import calendar
 import csv
+import gzip
 import hashlib
+import io
 import json
 import math
 import re
@@ -27,19 +29,36 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def read_csv_rows(path: Path) -> list[dict[str, str]]:
-    with path.open(encoding="utf-8-sig", newline="") as file:
+    with open_csv_text(path) as file:
         return list(csv.DictReader(file))
+
+
+def open_csv_text(path: Path) -> Any:
+    if path.suffix == ".gz":
+        return gzip.open(path, mode="rt", encoding="utf-8-sig", newline="")
+    return path.open(encoding="utf-8-sig", newline="")
 
 
 def write_csv_rows(path: Path, fields: list[str], rows: Iterable[dict[str, Any]]) -> int:
     path.parent.mkdir(parents=True, exist_ok=True)
     count = 0
-    with path.open("w", encoding="utf-8", newline="") as file:
+    if path.suffix == ".gz":
+        raw_file = path.open("wb")
+        compressed_file = gzip.GzipFile(filename="", mode="wb", fileobj=raw_file, mtime=0)
+        file = io.TextIOWrapper(compressed_file, encoding="utf-8", newline="")
+    else:
+        raw_file = path.open("w", encoding="utf-8", newline="")
+        file = raw_file
+    try:
         writer = csv.DictWriter(file, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         for row in rows:
             writer.writerow(row)
             count += 1
+    finally:
+        file.close()
+        if path.suffix == ".gz":
+            raw_file.close()
     return count
 
 

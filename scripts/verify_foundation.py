@@ -80,11 +80,11 @@ if config_path.is_file():
         REQUIRED_FILES.extend(
             (generated_dir / name).as_posix()
             for name in [
-                "crop_profiles.csv",
-                "price_history.csv",
-                "crop_references.csv",
-                "supply_snapshots.csv",
-                "soil_suitability.csv",
+                "crop_profiles.csv.gz",
+                "price_history.csv.gz",
+                "crop_references.csv.gz",
+                "supply_snapshots.csv.gz",
+                "soil_suitability.csv.gz",
                 "metadata.json",
             ]
         )

@@ -1,7 +1,7 @@
 {
-  "dataset_version": "demo-2026-09-v2",
+  "dataset_version": "demo-2026-09-v3",
   "seed": 20260924,
-  "generation_version": "2.0.0",
+  "generation_version": "3.0.0",
   "periods": {
     "current_supply": {
       "start": "2026-09-01",
@@ -10,10 +10,11 @@
     "price_start_month": "2023-09",
     "price_month_count": 36,
     "future_planning": {
-      "start": "2027-01-01",
+      "start": "2026-10-01",
       "end": "2028-12-31",
       "period_granularity": "quarter",
       "quarter_starts": [
+        "2026-10-01",
         "2027-01-01",
         "2027-04-01",
         "2027-07-01",
