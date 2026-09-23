@@ -70,6 +70,10 @@ def write_json(path: Path, value: Any) -> None:
 
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
+    text_suffixes = {".csv", ".json"}
+    if path.suffix.lower() in text_suffixes:
+        digest.update(path.read_bytes().replace(b"\r\n", b"\n"))
+        return digest.hexdigest()
     with path.open("rb") as file:
         for chunk in iter(lambda: file.read(1024 * 1024), b""):
             digest.update(chunk)

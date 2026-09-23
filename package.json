@@ -20,6 +20,7 @@
     "test:py": "node scripts/run-python.mjs -m pytest",
     "test": "npm run test:js && npm run test:py",
     "smoke:api": "node scripts/run-python.mjs scripts/smoke_api.py",
+    "smoke:risk": "node scripts/run-python.mjs scripts/smoke_risk_api.py",
     "lint:js": "npm run lint --workspaces --if-present",
     "lint:py": "node scripts/run-python.mjs -m ruff check services tests scripts",
     "lint": "npm run lint:js && npm run lint:py"
