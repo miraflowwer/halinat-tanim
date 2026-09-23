@@ -1,5 +1,3 @@
-BEGIN;
-
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
     email TEXT NOT NULL UNIQUE,
@@ -137,5 +135,3 @@ CREATE TABLE IF NOT EXISTS soil_suitability (
     method_note TEXT,
     UNIQUE (crop_id, geography_id, dataset_version)
 );
-
-COMMIT;

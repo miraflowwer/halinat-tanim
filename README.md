@@ -36,6 +36,21 @@ On Windows, double-click `TANIM.bat`.
 
 The launcher checks local dependencies before starting TANIM. It must ask before attempting to install missing software.
 
+## Local development setup
+
+Install Node.js 20 or later, npm 10 or later, Python 3.12 or later, and PostgreSQL. Copy `.env.example` to `.env` and set `DATABASE_URL` for your local database. Do not put real credentials in tracked files.
+
+From the repository folder, install the project dependencies and create the database tables:
+
+```powershell
+npm install
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+.\.venv\Scripts\python.exe scripts/init_db.py
+```
+
+The database command checks the connection and applies `data/migrations/001_foundation.sql` in a transaction. It can be run again safely. After setup, `npm run db:init` runs the same command using the local `.venv`.
+
 ## Stop TANIM
 
 Double-click `STOP_TANIM.bat`.

@@ -1,5 +1,6 @@
-from pathlib import Path
+import subprocess
 import sys
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -11,6 +12,7 @@ REQUIRED_FILES = [
     ".gitignore",
     ".editorconfig",
     "package.json",
+    "package-lock.json",
     "pyproject.toml",
     "TANIM.bat",
     "STOP_TANIM.bat",
@@ -22,6 +24,15 @@ REQUIRED_FILES = [
     "scripts/start-tanim.ps1",
     "scripts/stop-tanim.ps1",
     "scripts/check-health.ps1",
+    "scripts/init_db.py",
+    "scripts/smoke_api.py",
+    "scripts/run-python.mjs",
+    "scripts/run-frontends.ps1",
+    "services/api/app.py",
+    "services/engine/__init__.py",
+    "tests/test_api_health.py",
+    "tests/test_foundation.py",
+    "tests/test_workspaces.py",
 ]
 
 REQUIRED_DIRS = [
@@ -54,6 +65,24 @@ for item in REQUIRED_DIRS:
     if not (ROOT / item).is_dir():
         missing.append(f"missing directory: {item}")
 
+for app_name in ["landing", "auth", "platform", "docs"]:
+    app_root = ROOT / "apps" / app_name
+    required_app_files = [
+        "package.json",
+        "index.html",
+        "src/main.tsx",
+        "vite.config.ts",
+        "tsconfig.json",
+    ]
+    for relative in required_app_files:
+        if not (app_root / relative).is_file():
+            missing.append(f"missing file: apps/{app_name}/{relative}")
+
+for package_name in ["ui", "i18n", "types", "config"]:
+    package_root = ROOT / "packages" / package_name
+    if not (package_root / "package.json").is_file():
+        missing.append(f"missing file: packages/{package_name}/package.json")
+
 for forbidden in [".env", "node_modules", ".venv"]:
     if (ROOT / forbidden).exists():
         print(f"warning: local-only path exists: {forbidden}")
@@ -63,5 +92,34 @@ if missing:
     for item in missing:
         print(f"- {item}")
     sys.exit(1)
+
+tracked_result = subprocess.run(
+    ["git", "ls-files", "-z"], cwd=ROOT, capture_output=True, check=False
+)
+if tracked_result.returncode == 0:
+    forbidden_parts = {
+        "node_modules",
+        ".venv",
+        "venv",
+        "dist",
+        "build",
+        "coverage",
+        "__pycache__",
+        ".pytest_cache",
+        ".ruff_cache",
+    }
+    for encoded_path in tracked_result.stdout.split(b"\0"):
+        if not encoded_path:
+            continue
+        tracked_path = Path(encoded_path.decode("utf-8", errors="replace"))
+        normalized_parts = {part.lower() for part in tracked_path.parts}
+        if tracked_path.name == ".env" or normalized_parts.intersection(forbidden_parts):
+            missing.append(f"forbidden tracked local file: {tracked_path.as_posix()}")
+
+    if missing:
+        print("TANIM foundation verification failed.")
+        for item in missing:
+            print(f"- {item}")
+        sys.exit(1)
 
 print("TANIM foundation verification passed.")

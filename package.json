@@ -6,16 +6,19 @@
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "verify:foundation": "python scripts/verify_foundation.py",
+    "db:init": "node scripts/run-python.mjs scripts/init_db.py",
     "dev:landing": "npm --workspace @tanim/landing run dev -- --host 127.0.0.1 --port 3000",
     "dev:auth": "npm --workspace @tanim/auth run dev -- --host 127.0.0.1 --port 3001",
     "dev:platform": "npm --workspace @tanim/platform run dev -- --host 127.0.0.1 --port 3002",
     "dev:docs": "npm --workspace @tanim/docs run dev -- --host 127.0.0.1 --port 3003",
     "dev:frontends": "concurrently -k -n landing,auth,platform,docs \"npm run dev:landing\" \"npm run dev:auth\" \"npm run dev:platform\" \"npm run dev:docs\"",
+    "build": "npm run build --workspaces --if-present",
     "test:js": "npm run test --workspaces --if-present",
-    "test:py": "python -m pytest",
+    "test:py": "node scripts/run-python.mjs -m pytest",
     "test": "npm run test:js && npm run test:py",
+    "smoke:api": "node scripts/run-python.mjs scripts/smoke_api.py",
     "lint:js": "npm run lint --workspaces --if-present",
-    "lint:py": "python -m ruff check services tests scripts",
+    "lint:py": "node scripts/run-python.mjs -m ruff check services tests scripts",
     "lint": "npm run lint:js && npm run lint:py"
   },
   "devDependencies": {
