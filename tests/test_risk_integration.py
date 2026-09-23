@@ -93,52 +93,59 @@ def _seed_isolated_rows(connection) -> None:
         """,
         (dataset_version, 20260924, "0" * 64, Jsonb({"dataset_version": dataset_version})),
     )
-    connection.executemany(
-        """
-        INSERT INTO crop_references (
-            crop_id, geography_id, period_start, period_end, period_kind,
-            reference_area_ha, area_unit, data_kind, dataset_version
-        ) VALUES (%s, %s, %s, %s, 'future_planning', %s, 'ha', 'synthetic_demo', %s)
-        """,
-        [
-            ("tomato", geography_id, date(2027, 1, 1), date(2027, 3, 31), 25, dataset_version),
-            ("eggplant", geography_id, date(2027, 1, 1), date(2027, 3, 31), 18, dataset_version),
-        ],
-    )
-    connection.executemany(
-        """
-        INSERT INTO planting_plans (
-            user_id, crop_id, geography_id, area_ha, planting_date,
-            harvest_start, harvest_end, status
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
-        """,
-        [
-            (
-                user_id, "tomato", geography_id, 8, date(2026, 10, 1),
-                date(2027, 1, 1), date(2027, 1, 31), "active"
-            ),
-            (
-                user_id, "tomato", geography_id, 8, date(2026, 10, 1),
-                date(2027, 2, 1), date(2027, 2, 28), "active"
-            ),
-            (
-                user_id, "tomato", geography_id, 8, date(2026, 10, 1),
-                date(2027, 3, 1), date(2027, 3, 31), "active"
-            ),
-            (
-                user_id, "tomato", geography_id, 8, date(2026, 10, 1),
-                date(2027, 1, 15), date(2027, 2, 15), "active"
-            ),
-            (
-                user_id, "tomato", geography_id, 99, date(2026, 10, 1),
-                date(2027, 1, 1), date(2027, 3, 31), "cancelled"
-            ),
-            (
-                user_id, "eggplant", geography_id, 12, date(2026, 10, 1),
-                date(2027, 1, 1), date(2027, 3, 31), "active"
-            ),
-        ],
-    )
+    with connection.cursor() as cursor:
+        cursor.executemany(
+            """
+            INSERT INTO crop_references (
+                crop_id, geography_id, period_start, period_end, period_kind,
+                reference_area_ha, area_unit, data_kind, dataset_version
+            ) VALUES (%s, %s, %s, %s, 'future_planning', %s, 'ha', 'synthetic_demo', %s)
+            """,
+            [
+                (
+                    "tomato", geography_id, date(2027, 1, 1), date(2027, 3, 31),
+                    25, dataset_version
+                ),
+                (
+                    "eggplant", geography_id, date(2027, 1, 1), date(2027, 3, 31),
+                    18, dataset_version
+                ),
+            ],
+        )
+        cursor.executemany(
+            """
+            INSERT INTO planting_plans (
+                user_id, crop_id, geography_id, area_ha, planting_date,
+                harvest_start, harvest_end, status
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            """,
+            [
+                (
+                    user_id, "tomato", geography_id, 8, date(2026, 10, 1),
+                    date(2027, 1, 1), date(2027, 1, 31), "active"
+                ),
+                (
+                    user_id, "tomato", geography_id, 8, date(2026, 10, 1),
+                    date(2027, 2, 1), date(2027, 2, 28), "active"
+                ),
+                (
+                    user_id, "tomato", geography_id, 8, date(2026, 10, 1),
+                    date(2027, 3, 1), date(2027, 3, 31), "active"
+                ),
+                (
+                    user_id, "tomato", geography_id, 8, date(2026, 10, 1),
+                    date(2027, 1, 15), date(2027, 2, 15), "active"
+                ),
+                (
+                    user_id, "tomato", geography_id, 99, date(2026, 10, 1),
+                    date(2027, 1, 1), date(2027, 3, 31), "cancelled"
+                ),
+                (
+                    user_id, "eggplant", geography_id, 12, date(2026, 10, 1),
+                    date(2027, 1, 1), date(2027, 3, 31), "active"
+                ),
+            ],
+        )
 
 
 def test_post_risk_check_uses_isolated_postgresql_data(isolated_risk_service, monkeypatch):
