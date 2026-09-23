@@ -47,20 +47,12 @@ def _chunks(values: Iterable[tuple[Any, ...]], size: int) -> Iterator[list[tuple
         yield batch
 
 
-def _insert_new_rows(
-    connection: Any, statement: str, values: Iterable[tuple[Any, ...]], label: str
-) -> int:
+def _insert_new_rows(connection: Any, statement: str, values: Iterable[tuple[Any, ...]]) -> int:
     inserted = 0
     with connection.cursor() as cursor:
         for batch in _chunks(values, BATCH_SIZE):
-            cursor.executemany(statement, batch, returning=True)
-            returned = cursor.fetchall()
-            if len(returned) != len(batch):
-                raise SeedError(
-                    f"{label} contains rows already stored for this dataset version without "
-                    "matching dataset metadata. The transaction was rolled back."
-                )
-            inserted += len(returned)
+            cursor.executemany(statement, batch)
+            inserted += len(batch)
     return inserted
 
 
@@ -243,6 +235,25 @@ def _version_exists(
     return False
 
 
+def _ensure_version_rows_absent(connection: Any, version: str) -> None:
+    tables = (
+        "crop_profiles",
+        "price_history",
+        "crop_references",
+        "supply_snapshots",
+        "soil_suitability",
+        "demo_scenarios",
+    )
+    with connection.cursor() as cursor:
+        for table in tables:
+            cursor.execute(f"SELECT 1 FROM {table} WHERE dataset_version = %s LIMIT 1", (version,))
+            if cursor.fetchone():
+                raise SeedError(
+                    f"dataset version {version} has existing rows in {table} without matching "
+                    "dataset metadata. No rows were changed."
+                )
+
+
 def _seed_version(
     connection: Any,
     dataset_dir: Path,
@@ -258,6 +269,7 @@ def _seed_version(
     connection.execute("SELECT pg_advisory_xact_lock(hashtext(%s))", (f"tanim:{version}",))
     if _version_exists(connection, version, manifest_hash, metadata, len(scenarios)):
         return {"already_seeded": 1}
+    _ensure_version_rows_absent(connection, version)
 
     _upsert_crops(connection, crops)
     database_geographies = _upsert_geographies(connection, geographies)
@@ -276,8 +288,6 @@ def _seed_version(
             growing_conditions_en, growing_conditions_tl, soil_notes_en, soil_notes_tl,
             data_kind, reference_sources, method_note
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (crop_id, dataset_version) DO NOTHING
-        RETURNING 1
     """
     profile_count = _insert_new_rows(
         connection,
@@ -298,7 +308,6 @@ def _seed_version(
             )
             for row in profiles
         ),
-        "crop profile data",
     )
 
     prices = read_csv_rows(dataset_dir / "price_history.csv")
@@ -307,8 +316,6 @@ def _seed_version(
             crop_id, geography_id, price_date, price_php_per_kg, currency, price_unit,
             data_kind, dataset_version, reference_sources
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (crop_id, geography_id, price_date, dataset_version) DO NOTHING
-        RETURNING 1
     """
     price_count = _insert_new_rows(
         connection,
@@ -327,7 +334,6 @@ def _seed_version(
             )
             for row in prices
         ),
-        "price history",
     )
 
     references = read_csv_rows(dataset_dir / "crop_references.csv")
@@ -336,8 +342,6 @@ def _seed_version(
             crop_id, geography_id, period_start, period_end, reference_area_ha, area_unit,
             data_kind, dataset_version, reference_sources, method_note
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (crop_id, geography_id, period_start, period_end, dataset_version) DO NOTHING
-        RETURNING 1
     """
     reference_count = _insert_new_rows(
         connection,
@@ -357,7 +361,6 @@ def _seed_version(
             )
             for row in references
         ),
-        "crop reference data",
     )
 
     snapshots = read_csv_rows(dataset_dir / "supply_snapshots.csv")
@@ -366,8 +369,6 @@ def _seed_version(
             crop_id, geography_id, period_start, period_end, planned_area_ha,
             reference_area_ha, area_unit, ratio, risk_level, data_kind, dataset_version
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (crop_id, geography_id, period_start, period_end, dataset_version) DO NOTHING
-        RETURNING 1
     """
     snapshot_count = _insert_new_rows(
         connection,
@@ -388,7 +389,6 @@ def _seed_version(
             )
             for row in snapshots
         ),
-        "supply snapshot data",
     )
 
     suitability = read_csv_rows(dataset_dir / "soil_suitability.csv")
@@ -397,8 +397,6 @@ def _seed_version(
             crop_id, geography_id, suitability_class, data_kind, dataset_version,
             reference_sources, method_note
         ) VALUES (%s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (crop_id, geography_id, dataset_version) DO NOTHING
-        RETURNING 1
     """
     suitability_count = _insert_new_rows(
         connection,
@@ -415,7 +413,6 @@ def _seed_version(
             )
             for row in suitability
         ),
-        "soil suitability data",
     )
 
     scenario_statement = """
@@ -424,8 +421,6 @@ def _seed_version(
             existing_planned_area_ha, proposed_future_plan_area_ha, reference_area_ha,
             projected_area_ha, expected_future_ratio, expected_future_risk, data_kind, fixture_data
         ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        ON CONFLICT (scenario_id, dataset_version) DO NOTHING
-        RETURNING 1
     """
     scenario_count = _insert_new_rows(
         connection,
@@ -449,7 +444,6 @@ def _seed_version(
             )
             for row in scenarios
         ),
-        "demo scenario data",
     )
     return {
         "crop_profiles": profile_count,
