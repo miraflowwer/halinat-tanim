@@ -30,6 +30,7 @@ chicken,Chicken,livestock,false,DA-PRICE-MONITORING,,,livestock is outside the c
 chico,Sapodilla,fruit,true,PSA-QUEZON-CRPS-2022,chico|sapodilla,Chico,
 chili_leaves,Chili leaves,vegetable,true,PSA-QUEZON-CRPS-2022,chili pepper leaves|pepper chili leaves|sili leaves,Dahon ng sili,
 chili_pepper,Chili pepper,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,hot pepper,Sili,
+chinese_cabbage,Chinese cabbage,vegetable,true,PSA-BENGUET-CRPS-2025-Q1|PSA-BENGUET-HV-2025-H1|Kew-Plants-of-the-World-Online,napa cabbage|wombok,Repolyong Tsino,
 coconut,Coconut,plantation,false,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,,,plantation commodity is outside the current horticultural MVP scope
 coconut_leaves,Coconut leaves,plantation,false,PSA-QUEZON-CRPS-2022,,,coconut plantation product is outside the current MVP crop scope
 coconut_pith,Coconut pith,plantation,false,PSA-QUEZON-CRPS-2022,,,coconut plantation product is outside the current MVP crop scope
@@ -60,6 +61,7 @@ kaong,Kaong,plantation,false,PSA-QUEZON-CRPS-2022,,,palm crop and processed sap 
 kidney_bean,Kidney bean,legume,true,PSA-QUEZON-CRPS-2022,white kidney bean|white kidney beans,Butil ng kidney bean,
 lanzones,Lanzones,fruit,true,PSA-QUEZON-CRPS-2022,lanzon|lansones,Lanzones,
 laza_tambo,Laza or tambo,plant_product,false,PSA-QUEZON-CRPS-2022,,,non-food plant material is outside the current crop scope
+lemon,Lemon,fruit,true,PSA-BENGUET-CRPS-2025-Q1|Kew-Plants-of-the-World-Online,lemon fruit,Limon,
 lemongrass,Lemongrass,herb,true,DA-PRICE-MONITORING,lemon grass,Tanglad,
 lepote,Lepote,fruit,true,PSA-QUEZON-CRPS-2022,lepote fruit,Lepote,
 lettuce,Lettuce,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING,,Letsugas,
@@ -102,8 +104,10 @@ soursop,Soursop,fruit,true,PSA-QUEZON-CRPS-2022,guyabano|graviola,Guyabano,
 squash,Squash,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Kalabasa,
 squash_tops,Squash tops,vegetable,true,PSA-QUEZON-CRPS-2022,squash leaves|squash tops,Talbos ng kalabasa,
 star_apple,Star apple,fruit,true,PSA-QUEZON-CRPS-2022,caimito|star apple,Kaimito,
+strawberry,Strawberry,fruit,true,PSA-BENGUET-STRAWBERRY-2010-2025|PSA-BENGUET-CRPS-2025-Q1|Kew-Plants-of-the-World-Online,strawberries,Istraberi,
 string_bean,String bean,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,yardlong bean,Sitaw,
 sugarcane,Sugarcane,plantation,false,DA-PRICE-MONITORING|PSA-QUEZON-CRPS-2022,,,plantation commodity is outside the current horticultural MVP scope
+sweet_peas,Sweet peas,legume,true,PSA-BENGUET-HV-2025-H1|Kew-Plants-of-the-World-Online,snow peas|sugar peas,Sitsaro,
 sweet_potato,Sweet potato,root_crop,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Kamote,
 tamarind,Tamarind,fruit,true,PSA-QUEZON-CRPS-2022,sampalok|tamarind fruit,Sampalok,
 taro,Taro,root_crop,true,DA-PRICE-MONITORING|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Gabi,

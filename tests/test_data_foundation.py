@@ -16,7 +16,12 @@ from scripts.data_common import (
     write_csv_rows,
     write_json,
 )
-from scripts.generate_demo_data import PROVENANCE_IDS, generate_dataset
+from scripts.generate_demo_data import (
+    PROVENANCE_IDS,
+    _profile_context,
+    _profile_rows,
+    generate_dataset,
+)
 from scripts.seed_data import SeedError, _seed_version
 from scripts.validate_data import _verify_scenarios, validate_crop_scope_inventory, validate_dataset
 
@@ -40,10 +45,10 @@ def _write_minimal_inputs(root: Path, seed: int = 7) -> tuple[Path, Path, Path]:
         ],
         [
             {
-                "crop_id": "test_crop",
-                "canonical_name_en": "Test Crop",
-                "canonical_name_tl": "Pananim na Pagsubok",
-                "scientific_name": "Testus cropus",
+                "crop_id": "tomato",
+                "canonical_name_en": "Tomato",
+                "canonical_name_tl": "Kamatis",
+                "scientific_name": "Solanum lycopersicum",
                 "category": "vegetable",
                 "aliases_en": "",
                 "aliases_tl": "",
@@ -454,7 +459,13 @@ def test_crop_scope_inventory_matches_registry():
         "radish",
         "habichuelas",
         "patola",
+        "strawberry",
+        "lemon",
+        "chinese_cabbage",
+        "sweet_peas",
     } <= set(in_scope)
+    for crop_id in ("chinese_cabbage", "lemon", "strawberry", "sweet_peas"):
+        assert "Kew-Plants-of-the-World-Online" in in_scope[crop_id]["source_references"].split("|")
     for crop_id in ("white_potato", "chayote", "celery"):
         assert "DA-AMAS-PM-2026-02-25" in in_scope[crop_id]["source_references"].split("|")
     for crop_id in ("kangkong", "radish", "habichuelas", "patola"):
@@ -501,7 +512,22 @@ def test_generated_supply_periods_and_profiles_are_auditable():
     assert {row["crop_id"] for row in current_snapshots} == expected_crop_ids
     assert {row["crop_id"] for row in profiles} == expected_crop_ids
     assert len({row["summary_en"] for row in profiles}) == len(expected_crop_ids)
-    assert len({row["growing_conditions_en"] for row in profiles}) >= 20
+    context = _profile_context()
+    assert set(context) == expected_crop_ids
+    assert all(
+        len(fields) == 6 and all(field.strip() for field in fields)
+        for fields in context.values()
+    )
+    for row in profiles:
+        assert tuple(row[field] for field in (
+            "summary_en", "summary_tl", "growing_conditions_en", "growing_conditions_tl",
+            "soil_notes_en", "soil_notes_tl",
+        )) == context[row["crop_id"]]
+
+
+def test_generator_rejects_an_active_crop_without_deliberate_profile():
+    with pytest.raises(ValueError, match="lack deliberate profile content"):
+        list(_profile_rows([{"crop_id": "unsupported_crop", "active": "true"}], "test-v1"))
 
 
 def test_suitability_generation_is_repeatable(tmp_path):

@@ -1,7 +1,7 @@
 {
-  "dataset_version": "demo-2026-09-v3",
+  "dataset_version": "demo-2026-09-v4",
   "seed": 20260924,
-  "generation_version": "3.0.0",
+  "generation_version": "4.0.0",
   "periods": {
     "current_supply": {
       "start": "2026-09-01",

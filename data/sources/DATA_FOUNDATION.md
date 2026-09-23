@@ -2,7 +2,7 @@
 
 ## Canonical registries
 
-The canonical crop list is `data/registry/crops.csv`. Each crop has a stable `crop_id`. Generated records use that ID instead of a display name. The declared crop universe is `data/registry/crop_scope_inventory.csv`. Validation requires the active registry membership to equal the inventory rows marked `in_scope = true`. The inventory also records aliases, source context, and reasons for exclusions.
+The canonical crop list is `data/registry/crops.csv`. Each crop has a stable `crop_id`. Generated records use that ID instead of a display name. The crop coverage inventory is `data/registry/crop_scope_inventory.csv`. Validation requires the active registry membership to equal the inventory rows marked `in_scope = true`. The inventory also records aliases, source context, and reasons for category exclusions.
 
 The canonical geography list is `data/registry/geographies.csv`. It uses the official PSGC code in a stable ID such as `province_0304900000` or `mun_0304903000`. The database keeps its own numeric key and stores the canonical ID in `geographies.geography_id`.
 
@@ -10,7 +10,7 @@ The geography registry covers Luzon. It has 8 regions, 38 provinces, and 771 cit
 
 ## Dataset version and generation
 
-`data/dataset_config.json` is the one source for the dataset version, fixed seed, time periods, and demo snapshot thresholds. The current version is `demo-2026-09-v3` with seed `20260924`.
+`data/dataset_config.json` is the one source for the dataset version, fixed seed, time periods, and demo snapshot thresholds. The current version is `demo-2026-09-v4` with seed `20260924`. It covers 90 crops, including the Benguet Strawberry, Lemon, Chinese cabbage, and Sweet peas additions.
 
 The time contract has two parts:
 
@@ -49,6 +49,8 @@ This helper labels synthetic snapshots only. It is not the Phase 3 risk engine. 
 Reference area values use this deterministic hierarchy: crop category baseline, crop behavior factor, region agricultural profile, province band, municipality scale, period factor, and small bounded variation. NCR and obvious urban locations receive a lower municipality scale. The model makes neighboring locations follow their regional and province context instead of using a hash bucket as the primary value.
 
 Suitability starts from a crop and category baseline with a geographic suitability baseline. A small bounded deterministic variation is applied after the baseline. The labels are synthetic demo context and are not an agronomic prediction, soil survey, yield guarantee, or profitability claim.
+
+Each active crop has a deliberate English and Tagalog profile for its overview, growing context, and soil context. Generation fails if a crop is added without profile content. These short descriptions are general crop context, not local planting advice.
 
 External price sources remain attached only to price rows. Reference area and suitability rows use their TANIM synthetic method identifiers because no external area or suitability number was copied into those rows.
 

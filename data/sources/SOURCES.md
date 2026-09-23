@@ -74,6 +74,36 @@ The geographic names and codes were loaded from the public PSGC Cloud API as a s
 - License: PSA website content is CC BY 4.0 unless otherwise noted
 - Transformation: used as a crop coverage and naming reference. The report's production values are not copied into generated TANIM data.
 
+- Source name: 2010-2025 Strawberry Situationer: Province of Benguet
+- Source ID: `PSA-BENGUET-STRAWBERRY-2010-2025`
+- Institution: Philippine Statistics Authority (PSA), Cordillera Administrative Region
+- Resource: Special Release SSR 2026-49, released 30 June 2026
+- Use in TANIM: confirms strawberry as a significant Benguet fruit crop
+- Retrieval date: 2026-09-24
+- URL: [PSA Benguet strawberry situationer](https://rssocar.psa.gov.ph/content/2010-2025-strawberry-situationer-province-benguet)
+- License: PSA website content is CC BY 4.0 unless otherwise noted
+- Transformation: used to add strawberry to the crop registry. Its production values are not copied into TANIM data.
+
+- Source name: 2025 First Quarter Other Crops Production Situation in Benguet
+- Source ID: `PSA-BENGUET-CRPS-2025-Q1`
+- Institution: Philippine Statistics Authority (PSA), Cordillera Administrative Region
+- Resource: first quarter 2025 crop production report
+- Use in TANIM: confirms strawberry, lemon, and Chinese cabbage crop coverage in Benguet
+- Retrieval date: 2026-09-24
+- URL: [PSA Benguet first quarter crop report](https://rssocar.psa.gov.ph/content/2025-first-quarter-other-crops-production-situation-benguet)
+- License: PSA website content is CC BY 4.0 unless otherwise noted
+- Transformation: used to review crop names and registry coverage. Its production values are not copied into TANIM data.
+
+- Source name: Situation of Selected High Value Crops of Benguet, January-June 2025
+- Source ID: `PSA-BENGUET-HV-2025-H1`
+- Institution: Philippine Statistics Authority (PSA), Cordillera Administrative Region
+- Resource: first semester 2025 high value vegetable report
+- Use in TANIM: confirms Chinese cabbage and sweet peas as marketed Benguet crops
+- Retrieval date: 2026-09-24
+- URL: [PSA Benguet high value crops report](https://rssocar.psa.gov.ph/content/situation-selected-high-value-crops-benguet-january-june-2025)
+- License: PSA website content is CC BY 4.0 unless otherwise noted
+- Transformation: used for crop coverage and naming. Its production values are not copied into TANIM data.
+
 - Source name: Plants of the World Online
 - Institution: Royal Botanic Gardens, Kew
 - Resource: botanical names and plant taxonomy database
@@ -89,7 +119,7 @@ All generated prices, reference areas, planned areas, supply ratios, and soil su
 
 ## TANIM crop scope inventory
 
-`data/registry/crop_scope_inventory.csv` is TANIM's declared crop scope for this demo, not a complete census of every crop grown in Luzon. It is cross-checked against DA price monitoring, including the 25 February 2026 report, PSA's 2022 Quezon Crops Production report, and PSA's 2025 Quezon Vegetable and Root Crops report. The inventory records aliases, source context, and explicit exclusions. It includes commodity forms such as Kangkong, Radish, Habitchuelas, Chayote, Patola, White Potato, Celery, and other vegetables that were absent from the earlier registry.
+`data/registry/crop_scope_inventory.csv` records the food-crop coverage decisions for Luzon under the [product crop scope](../../requirements/PRODUCT_REQUIREMENTS.md). It is cross-checked against DA price monitoring and PSA crop reports from Quezon and Benguet. The inventory records aliases, source context, and explicit category exclusions. The latest review added Strawberry, Lemon, Chinese cabbage, and Sweet peas after checking the Benguet reports. A newly identified relevant crop must be added with all required TANIM datasets and a deliberate English and Tagalog profile before it is supported.
 
 These sources support coverage review and naming context. They do not publish the generated profile, area, supply, or suitability values. Crops reported for Quezon are not assumed to be grown in every supported Luzon municipality. Rice, corn, plantation crops, livestock, fisheries, ornamentals, and beverage or industrial crops outside the current MVP categories are listed as explicit exclusions with reasons.
 
@@ -109,7 +139,7 @@ These sources support coverage review and naming context. They do not publish th
 
 The generated rows use method identifiers when an external source did not directly shape a value:
 
-- `TANIM-SYNTH-CROP-PROFILE-V1` supplies simple crop profile text.
+- `TANIM-SYNTH-CROP-PROFILE-V1` supplies deliberate English and Tagalog crop profile text for each active crop.
 - `TANIM-SYNTH-REFERENCE-AREA-V1` supplies synthetic reference area values.
 - `TANIM-SYNTH-CURRENT-SUPPLY-V1` supplies the September 2026 current map context.
 - `TANIM-SYNTH-FUTURE-SUPPLY-CONTEXT-V1` supplies future planning context rows.

@@ -190,6 +190,10 @@ def validate_crop_scope_inventory(
         "PSA-OPENSTAT-2M4AFN08",
         "PSA-QUEZON-CRPS-2022",
         "PSA-QUEZON-VRC-2025",
+        "PSA-BENGUET-CRPS-2025-Q1",
+        "PSA-BENGUET-HV-2025-H1",
+        "PSA-BENGUET-STRAWBERRY-2010-2025",
+        "Kew-Plants-of-the-World-Online",
     }
     for row_number, row in enumerate(rows, start=2):
         scope_id = row.get("scope_id", "").strip()

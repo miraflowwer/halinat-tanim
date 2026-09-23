@@ -1,0 +1,214 @@
+{
+  "canonical_units": {
+    "planned_area": "ha",
+    "price_history": {
+      "currency": "PHP",
+      "unit": "PHP/kg"
+    },
+    "ratio": "dimensionless decimal",
+    "reference_area": "ha"
+  },
+  "coverage": {
+    "prices": "36 monthly points per active crop and province, plus NCR",
+    "profiles": "one row for each active crop",
+    "reference_supply": "one current supply context row and one future planning reference row per active crop and city or municipality",
+    "soil_suitability": "one row per active crop and city or municipality",
+    "supply_snapshots": "one current map context row and one future supply context row per active crop and city or municipality"
+  },
+  "data_kind": "synthetic_demo",
+  "dataset_version": "demo-2026-09-v4",
+  "files": {
+    "crop_profiles.csv.gz": {
+      "row_count": 90,
+      "sha256": "7373aba035133267d86cd06657e1f7f61a818ca760eaee39d2178e5daa608fd0"
+    },
+    "crop_references.csv.gz": {
+      "row_count": 693900,
+      "sha256": "14e397659df2ad392e4a565dd5c3520cf61777edc214ce557cd15bb5b4b44a36"
+    },
+    "price_history.csv.gz": {
+      "row_count": 126360,
+      "sha256": "501d4f5dffc5bb00566a0156bcfeb2757fdc6271e2180571f57f8804e4803840"
+    },
+    "soil_suitability.csv.gz": {
+      "row_count": 69390,
+      "sha256": "baa2d22170a54242a5c7e6692df2722142b04d05db9219f7370b3d0c7982d830"
+    },
+    "supply_snapshots.csv.gz": {
+      "row_count": 693900,
+      "sha256": "655550e229d4930f3bcb4490173066f62348a759ec8ad93ff522183c67af2d6e"
+    }
+  },
+  "generation_version": "4.0.0",
+  "geographic_scope": {
+    "barangay_level_included": false,
+    "country": "Philippines",
+    "counts": {
+      "active_crops": 90,
+      "municipalities_cities": 771,
+      "provinces": 38,
+      "regions": 8
+    },
+    "island_group": "Luzon",
+    "levels": [
+      "region",
+      "province",
+      "municipality_city"
+    ],
+    "parent_note": "NCR cities and Pateros link directly to NCR because PSGC does not define provinces within NCR."
+  },
+  "input_sha256": {
+    "crop_scope_inventory.csv": "c1a280d9cac571be61dbb62244523c846497a4baea61cb48570b573be12ec2fc",
+    "crops.csv": "2542c87f61177d2a48b2ab0eac3bcb1904265cea6dcf83464605fc7a50961cd9",
+    "demo_scenarios.json": "bb1f5437bc5f62ca5013a346cd99e546a6f3c6bcf8b69b1a768404cecce494de",
+    "geographies.csv": "81b0566e09feb8df6216c2c9bdd9413d175312a59d00a955b3449f4ebeb2be0a"
+  },
+  "method_notes": [
+    "All agricultural numeric values are deterministic synthetic demo values.",
+    "Price ranges use manually set crop-category baselines, stable location factors, a smooth trend, seasonal factors, and small bounded variation. Baselines are not statistically calibrated to source publications.",
+    "Reference areas use crop behavior, region and province profiles, municipality scale, period factors, and small bounded deterministic variation. Obvious urban locations receive a lower scale.",
+    "Soil suitability starts from crop and geographic baselines and then applies small bounded deterministic variation. It is not a soil survey or market supply score.",
+    "Public sources inform data structure, crop naming, geography, crop coverage, and suitability concepts. They do not publish these generated values."
+  ],
+  "periods": {
+    "current_supply": {
+      "period_end": "2026-09-30",
+      "period_kind": "current_supply",
+      "period_start": "2026-09-01"
+    },
+    "future_planning": {
+      "period_end": "2028-12-31",
+      "period_kind": "future_planning",
+      "period_start": "2026-10-01",
+      "periods": [
+        {
+          "period_end": "2026-12-31",
+          "period_kind": "future_planning",
+          "period_start": "2026-10-01"
+        },
+        {
+          "period_end": "2027-03-31",
+          "period_kind": "future_planning",
+          "period_start": "2027-01-01"
+        },
+        {
+          "period_end": "2027-06-30",
+          "period_kind": "future_planning",
+          "period_start": "2027-04-01"
+        },
+        {
+          "period_end": "2027-09-30",
+          "period_kind": "future_planning",
+          "period_start": "2027-07-01"
+        },
+        {
+          "period_end": "2027-12-31",
+          "period_kind": "future_planning",
+          "period_start": "2027-10-01"
+        },
+        {
+          "period_end": "2028-03-31",
+          "period_kind": "future_planning",
+          "period_start": "2028-01-01"
+        },
+        {
+          "period_end": "2028-06-30",
+          "period_kind": "future_planning",
+          "period_start": "2028-04-01"
+        },
+        {
+          "period_end": "2028-09-30",
+          "period_kind": "future_planning",
+          "period_start": "2028-07-01"
+        },
+        {
+          "period_end": "2028-12-31",
+          "period_kind": "future_planning",
+          "period_start": "2028-10-01"
+        }
+      ]
+    },
+    "price_history_end": "2026-08-01",
+    "price_history_start": "2023-09-01"
+  },
+  "provenance": {
+    "crop_profiles": {
+      "meaning": "TANIM method supplies simple crop context; no source published these profile sentences.",
+      "source_ids": [
+        "TANIM-SYNTH-CROP-PROFILE-V1"
+      ]
+    },
+    "crop_references": {
+      "meaning": "TANIM method generated reference areas from structured synthetic geography and crop profiles.",
+      "source_ids": [
+        "TANIM-SYNTH-REFERENCE-AREA-V1"
+      ]
+    },
+    "price_history": {
+      "meaning": "Sources informed price concepts and crop coverage. They did not publish the generated prices.",
+      "source_ids": [
+        "PSA-OPENSTAT-2M4AFN08",
+        "DA-PRICE-MONITORING"
+      ]
+    },
+    "soil_suitability": {
+      "meaning": "TANIM method generated a baseline label. No external suitability record was copied.",
+      "source_ids": [
+        "TANIM-SYNTH-SOIL-BASELINE-V1"
+      ]
+    },
+    "supply_snapshots": {
+      "meaning": "TANIM methods generated current map context and future reference context separately.",
+      "source_ids": [
+        "TANIM-SYNTH-CURRENT-SUPPLY-V1",
+        "TANIM-SYNTH-FUTURE-SUPPLY-CONTEXT-V1"
+      ]
+    }
+  },
+  "reference_sources": [
+    "PSGC-Q2-2026",
+    "PSA-OPENSTAT-2M4AFN08",
+    "PSA-QUEZON-CRPS-2022",
+    "PSA-QUEZON-VRC-2025",
+    "PSA-BENGUET-CRPS-2025-Q1",
+    "PSA-BENGUET-HV-2025-H1",
+    "PSA-BENGUET-STRAWBERRY-2010-2025",
+    "DA-PRICE-MONITORING",
+    "DA-AMAS-PM-2026-02-25",
+    "Kew-Plants-of-the-World-Online",
+    "TANIM-SYNTH-CROP-PROFILE-V1",
+    "TANIM-SYNTH-REFERENCE-AREA-V1",
+    "TANIM-SYNTH-CURRENT-SUPPLY-V1",
+    "TANIM-SYNTH-FUTURE-SUPPLY-CONTEXT-V1",
+    "TANIM-SYNTH-SOIL-BASELINE-V1"
+  ],
+  "seed": 20260924,
+  "snapshot_formula": {
+    "ratio": "planned_area_ha / reference_area_ha, rounded to 6 decimal places",
+    "risk_labels": {
+      "high": "ratio > 1.1",
+      "low": "ratio < 0.9",
+      "moderate": "0.9 <= ratio <= 1.1",
+      "no_data": "reference area is missing or invalid"
+    },
+    "scope_note": "This formula labels synthetic context snapshots only, not Phase 3 risk results."
+  },
+  "synthetic_model": {
+    "reference_area": "crop baseline x crop behavior x region profile x province band x municipality scale x period factor x bounded deterministic variation",
+    "scope_note": "These are explainable demo values, not agronomic predictions or yield guarantees.",
+    "soil_suitability": "crop and category baseline x geography suitability baseline x bounded deterministic variation; no hash bucket is the primary decision"
+  },
+  "time_contract": {
+    "current_supply_period": {
+      "end": "2026-09-30",
+      "kind": "current_supply",
+      "start": "2026-09-01"
+    },
+    "future_planning_horizon": {
+      "end": "2028-12-31",
+      "granularity": "quarter",
+      "period_count": 9,
+      "start": "2026-10-01"
+    }
+  }
+}

@@ -22,6 +22,7 @@ chayote,Chayote,Sayote,Sechium edule,vegetable,chayote fruit|sayote,,true
 chico,Sapodilla,Chico,Manilkara zapota,fruit,chico|sapodilla,,true
 chili_leaves,Chili leaves,Dahon ng sili,Capsicum frutescens,vegetable,chili pepper leaves|pepper chili leaves|sili leaves,,true
 chili_pepper,Chili pepper,Sili,Capsicum frutescens,vegetable,hot pepper,,true
+chinese_cabbage,Chinese cabbage,Repolyong Tsino,Brassica rapa,vegetable,napa cabbage|wombok,,true
 cowpea,Cowpea,Cowpea,Vigna unguiculata subsp. unguiculata,legume,black-eyed pea|cowpea,,true
 cucumber,Cucumber,Pipino,Cucumis sativus,vegetable,,,true
 dragon_fruit,Dragon fruit,Dragon fruit,Selenicereus undatus,fruit,pitaya|dragon fruit,,true
@@ -39,6 +40,7 @@ kamias,Bilimbi,Kamias,Averrhoa bilimbi,fruit,kamias,,true
 kangkong,Kangkong,Kangkong,Ipomoea aquatica,vegetable,water spinach|swamp cabbage,,true
 kidney_bean,Kidney bean,Butil ng kidney bean,Phaseolus vulgaris,legume,white kidney bean|white kidney beans,,true
 lanzones,Lanzones,Lanzones,Lansium domesticum,fruit,lanzon|lansones,,true
+lemon,Lemon,Limon,Citrus × limon,fruit,lemon fruit,,true
 lemongrass,Lemongrass,Tanglad,Cymbopogon citratus,herb,lemon grass,,true
 lepote,Lepote,Lepote,,fruit,lepote fruit,,true
 lettuce,Lettuce,Letsugas,Lactuca sativa,vegetable,,,true
@@ -74,7 +76,9 @@ soursop,Soursop,Guyabano,Annona muricata,fruit,guyabano|graviola,,true
 squash,Squash,Kalabasa,Cucurbita moschata,vegetable,,,true
 squash_tops,Squash tops,Talbos ng kalabasa,Cucurbita moschata,vegetable,squash leaves|squash tops,,true
 star_apple,Star apple,Kaimito,Chrysophyllum cainito,fruit,caimito|star apple,,true
+strawberry,Strawberry,Istraberi,Fragaria × ananassa,fruit,strawberries,,true
 string_bean,String bean,Sitaw,Vigna unguiculata subsp. sesquipedalis,vegetable,yardlong bean,,true
+sweet_peas,Sweet peas,Sitsaro,Lathyrus oleraceus,legume,snow peas|sugar peas,,true
 sweet_potato,Sweet potato,Kamote,Ipomoea batatas,root_crop,,,true
 tamarind,Tamarind,Sampalok,Tamarindus indica,fruit,sampalok|tamarind fruit,,true
 taro,Taro,Gabi,Colocasia esculenta,root_crop,,,true
