@@ -11,6 +11,7 @@ from typing import Any
 if __package__:
     from scripts.data_common import (
         DEFAULT_CONFIG,
+        DEFAULT_CROP_SCOPE,
         DEFAULT_CROPS,
         DEFAULT_GEOGRAPHIES,
         DEFAULT_SCENARIOS,
@@ -23,6 +24,7 @@ if __package__:
 else:
     from data_common import (
         DEFAULT_CONFIG,
+        DEFAULT_CROP_SCOPE,
         DEFAULT_CROPS,
         DEFAULT_GEOGRAPHIES,
         DEFAULT_SCENARIOS,
@@ -39,6 +41,67 @@ BATCH_SIZE = 1000
 
 class SeedError(RuntimeError):
     """A safe, actionable data seed failure."""
+
+
+FINGERPRINT_QUERIES = {
+    "crop_profiles": """
+        SELECT md5(COALESCE(string_agg(
+            concat_ws(chr(31), crop_id, dataset_version, summary_en, summary_tl,
+                growing_conditions_en, growing_conditions_tl, soil_notes_en, soil_notes_tl,
+                data_kind, COALESCE(reference_sources, ''), COALESCE(method_note, '')),
+            chr(30) ORDER BY crop_id, dataset_version), ''))
+        FROM crop_profiles WHERE dataset_version = %s
+    """,
+    "price_history": """
+        SELECT md5(COALESCE(string_agg(
+            concat_ws(chr(31), crop_id, geography_id, price_date, price_php_per_kg,
+                currency, price_unit, data_kind, dataset_version, COALESCE(reference_sources, '')),
+            chr(30) ORDER BY crop_id, geography_id, price_date, dataset_version), ''))
+        FROM price_history WHERE dataset_version = %s
+    """,
+    "crop_references": """
+        SELECT md5(COALESCE(string_agg(
+            concat_ws(chr(31), crop_id, geography_id, period_start, period_end, period_kind,
+                reference_area_ha, area_unit, data_kind, dataset_version,
+                COALESCE(reference_sources, ''), COALESCE(method_note, '')),
+            chr(30) ORDER BY crop_id, geography_id, period_start, period_end, dataset_version), ''))
+        FROM crop_references WHERE dataset_version = %s
+    """,
+    "supply_snapshots": """
+        SELECT md5(COALESCE(string_agg(
+            concat_ws(chr(31), crop_id, geography_id, period_start, period_end, period_kind,
+                planned_area_ha, reference_area_ha, area_unit, ratio, risk_level, data_kind,
+                dataset_version, COALESCE(reference_sources, ''), COALESCE(method_note, '')),
+            chr(30) ORDER BY crop_id, geography_id, period_start, period_end, dataset_version), ''))
+        FROM supply_snapshots WHERE dataset_version = %s
+    """,
+    "soil_suitability": """
+        SELECT md5(COALESCE(string_agg(
+            concat_ws(chr(31), crop_id, geography_id, suitability_class, data_kind,
+                dataset_version, COALESCE(reference_sources, ''), COALESCE(method_note, '')),
+            chr(30) ORDER BY crop_id, geography_id, dataset_version), ''))
+        FROM soil_suitability WHERE dataset_version = %s
+    """,
+    "demo_scenarios": """
+        SELECT md5(COALESCE(string_agg(
+            concat_ws(chr(31), scenario_id, dataset_version, crop_id, geography_id,
+                period_start, period_end, period_kind, existing_planned_area_ha,
+                proposed_future_plan_area_ha, reference_area_ha, projected_area_ha,
+                expected_future_ratio, expected_future_risk, data_kind, fixture_data::text),
+            chr(30) ORDER BY scenario_id, dataset_version), ''))
+        FROM demo_scenarios WHERE dataset_version = %s
+    """,
+}
+
+
+def _database_fingerprints(connection: Any, version: str) -> dict[str, str]:
+    fingerprints: dict[str, str] = {}
+    with connection.cursor() as cursor:
+        for table, statement in FINGERPRINT_QUERIES.items():
+            cursor.execute(statement, (version,))
+            row = cursor.fetchone()
+            fingerprints[table] = row[0] if row else ""
+    return fingerprints
 
 
 def _chunks(values: Iterable[tuple[Any, ...]], size: int) -> Iterator[list[tuple[Any, ...]]]:
@@ -193,7 +256,8 @@ def _version_exists(
 ) -> bool:
     with connection.cursor() as cursor:
         cursor.execute(
-            "SELECT manifest_sha256, metadata FROM dataset_metadata WHERE dataset_version = %s",
+            "SELECT manifest_sha256, metadata, content_fingerprints "
+            "FROM dataset_metadata WHERE dataset_version = %s",
             (version,),
         )
         existing = cursor.fetchone()
@@ -230,6 +294,12 @@ def _version_exists(
                 raise SeedError(
                     f"dataset version {version} does not have the expected demo fixture rows. "
                     "No rows were changed."
+                )
+            expected_fingerprints = existing[2] or {}
+            if expected_fingerprints != _database_fingerprints(connection, version):
+                raise SeedError(
+                    f"dataset version {version} content fingerprint mismatch. "
+                    "A same-count record may have changed; no rows were changed."
                 )
             return True
     return False
@@ -275,10 +345,18 @@ def _seed_version(
     database_geographies = _upsert_geographies(connection, geographies)
     connection.execute(
         """
-        INSERT INTO dataset_metadata (dataset_version, data_kind, seed, manifest_sha256, metadata)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO dataset_metadata (
+            dataset_version, data_kind, seed, manifest_sha256, metadata, content_fingerprints
+        ) VALUES (%s, %s, %s, %s, %s, %s)
         """,
-        (version, metadata["data_kind"], metadata["seed"], manifest_hash, Jsonb(metadata)),
+        (
+            version,
+            metadata["data_kind"],
+            metadata["seed"],
+            manifest_hash,
+            Jsonb(metadata),
+            Jsonb({}),
+        ),
     )
 
     profiles = read_csv_rows(dataset_dir / "crop_profiles.csv")
@@ -303,7 +381,7 @@ def _seed_version(
                 row["soil_notes_en"],
                 row["soil_notes_tl"],
                 row["data_kind"],
-                None,
+                row["reference_sources"],
                 row["method_note"],
             )
             for row in profiles
@@ -339,9 +417,9 @@ def _seed_version(
     references = read_csv_rows(dataset_dir / "crop_references.csv")
     reference_statement = """
         INSERT INTO crop_references (
-            crop_id, geography_id, period_start, period_end, reference_area_ha, area_unit,
-            data_kind, dataset_version, reference_sources, method_note
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            crop_id, geography_id, period_start, period_end, period_kind, reference_area_ha,
+            area_unit, data_kind, dataset_version, reference_sources, method_note
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     reference_count = _insert_new_rows(
         connection,
@@ -352,6 +430,7 @@ def _seed_version(
                 database_geographies[row["geography_id"]],
                 row["period_start"],
                 row["period_end"],
+                row["period_kind"],
                 row["reference_area_ha"],
                 row["area_unit"],
                 row["data_kind"],
@@ -366,9 +445,10 @@ def _seed_version(
     snapshots = read_csv_rows(dataset_dir / "supply_snapshots.csv")
     snapshot_statement = """
         INSERT INTO supply_snapshots (
-            crop_id, geography_id, period_start, period_end, planned_area_ha,
-            reference_area_ha, area_unit, ratio, risk_level, data_kind, dataset_version
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            crop_id, geography_id, period_start, period_end, period_kind, planned_area_ha,
+            reference_area_ha, area_unit, ratio, risk_level, data_kind, dataset_version,
+            reference_sources, method_note
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     snapshot_count = _insert_new_rows(
         connection,
@@ -379,6 +459,7 @@ def _seed_version(
                 database_geographies[row["geography_id"]],
                 row["period_start"],
                 row["period_end"],
+                row["period_kind"],
                 row["planned_area_ha"],
                 row["reference_area_ha"],
                 row["area_unit"],
@@ -386,6 +467,8 @@ def _seed_version(
                 row["risk_level"],
                 row["data_kind"],
                 row["dataset_version"],
+                row["reference_sources"],
+                row["method_note"],
             )
             for row in snapshots
         ),
@@ -418,9 +501,10 @@ def _seed_version(
     scenario_statement = """
         INSERT INTO demo_scenarios (
             scenario_id, dataset_version, crop_id, geography_id, period_start, period_end,
+            period_kind,
             existing_planned_area_ha, proposed_future_plan_area_ha, reference_area_ha,
             projected_area_ha, expected_future_ratio, expected_future_risk, data_kind, fixture_data
-        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     scenario_count = _insert_new_rows(
         connection,
@@ -433,6 +517,7 @@ def _seed_version(
                 database_geographies[row["geography_id"]],
                 row["period_start"],
                 row["period_end"],
+                row["period_kind"],
                 row["existing_planned_area_ha"],
                 row["proposed_future_plan_area_ha"],
                 row["reference_area_ha"],
@@ -444,6 +529,10 @@ def _seed_version(
             )
             for row in scenarios
         ),
+    )
+    connection.execute(
+        "UPDATE dataset_metadata SET content_fingerprints = %s WHERE dataset_version = %s",
+        (Jsonb(_database_fingerprints(connection, version)), version),
     )
     return {
         "crop_profiles": profile_count,
@@ -459,6 +548,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--crop-registry", type=Path, default=DEFAULT_CROPS)
+    parser.add_argument("--crop-scope", type=Path, default=DEFAULT_CROP_SCOPE)
     parser.add_argument("--geography-registry", type=Path, default=DEFAULT_GEOGRAPHIES)
     parser.add_argument("--scenarios", type=Path, default=DEFAULT_SCENARIOS)
     parser.add_argument("--dataset-dir", type=Path)
@@ -478,6 +568,7 @@ def main(argv: list[str] | None = None) -> int:
             dataset_dir,
             args.scenarios,
             check_determinism=False,
+            crop_scope_path=args.crop_scope,
         )
     except (OSError, KeyError, ValueError) as error:
         print(f"Data seeding stopped: {error}", file=sys.stderr)

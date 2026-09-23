@@ -1,0 +1,50 @@
+scope_id,canonical_name_en,category,in_scope,source_references,aliases_en,aliases_tl,exclusion_reason
+avocado,Avocado,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+banana,Banana,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+basil,Basil,herb,true,DA-PRICE-MONITORING,,,
+bell_pepper,Bell pepper,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,sweet pepper,,
+bitter_gourd,Bitter gourd,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,bitter melon,Ampalaya,
+broccoli,Broccoli,vegetable,true,DA-PRICE-MONITORING,,,
+cabbage,Cabbage,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,headed cabbage,,
+calamansi,Calamansi,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,calamondin,Kalamansi,
+carrot,Carrot,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+cassava,Cassava,root_crop,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,manioc,Kamoteng kahoy,
+cauliflower,Cauliflower,vegetable,true,DA-PRICE-MONITORING,,,
+chili_pepper,Chili pepper,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,hot pepper,Sili,
+cucumber,Cucumber,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+eggplant,Eggplant,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,aubergine,Talong,
+garlic,Garlic,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+ginger,Ginger,spice,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+guava,Guava,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+lettuce,Lettuce,vegetable,true,DA-PRICE-MONITORING,,,
+lemongrass,Lemongrass,herb,true,DA-PRICE-MONITORING,lemon grass,Tanglad,
+mango,Mango,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+mung_bean,Mung bean,legume,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,green gram,Monggo,
+okra,Okra,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,lady's finger,Okra,
+onion,Onion,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,bulb onion,Sibuyas,
+papaya,Papaya,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+peanut,Peanut,legume,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,groundnut,Mani,
+pechay,Pechay,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,pak choi|bok choy,Pechay,
+pineapple,Pineapple,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+purple_yam,Purple yam,root_crop,true,DA-PRICE-MONITORING,,,
+squash,Squash,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+string_bean,String bean,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,yardlong bean,Sitaw,
+sweet_potato,Sweet potato,root_crop,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+taro,Taro,root_crop,true,DA-PRICE-MONITORING,,,
+tomato,Tomato,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,garden tomato,Kamatis,
+turmeric,Turmeric,spice,true,DA-PRICE-MONITORING,,,
+watermelon,Watermelon,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,
+rice,Rice,grain,false,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,staple grain is outside the current horticultural MVP scope
+corn,Corn,grain,false,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,grain commodity is outside the current horticultural MVP scope
+coconut,Coconut,plantation,false,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,plantation commodity is outside the current horticultural MVP scope
+sugarcane,Sugarcane,plantation,false,DA-PRICE-MONITORING,,,plantation commodity is outside the current horticultural MVP scope
+tobacco,Tobacco,industrial,false,DA-PRICE-MONITORING,,,industrial crop is outside the current food crop scope
+coffee,Coffee,beverage,false,DA-PRICE-MONITORING,,,beverage crop is outside the current MVP category scope
+cacao,Cacao,beverage,false,DA-PRICE-MONITORING,,,beverage crop is outside the current MVP category scope
+cattle,Cattle,livestock,false,DA-PRICE-MONITORING,,,livestock is outside the crop scope
+chicken,Chicken,livestock,false,DA-PRICE-MONITORING,,,livestock is outside the crop scope
+hog,Hog,livestock,false,DA-PRICE-MONITORING,,,livestock is outside the crop scope
+bangus,Bangus,aquaculture,false,DA-PRICE-MONITORING,,,fisheries are outside the current crop scope
+tilapia,Tilapia,aquaculture,false,DA-PRICE-MONITORING,,,fisheries are outside the current crop scope
+shrimp,Shrimp,aquaculture,false,DA-PRICE-MONITORING,,,fisheries are outside the current crop scope
+cut_flower,Cut flower,ornamental,false,DA-PRICE-MONITORING,,,ornamental production is outside the current food crop scope

@@ -1,5 +1,3 @@
-BEGIN;
-
 ALTER TABLE geographies
     ADD COLUMN IF NOT EXISTS geography_id TEXT;
 
@@ -27,7 +25,11 @@ COMMENT ON COLUMN geographies.geography_id IS
 
 ALTER TABLE crop_references
     ADD COLUMN IF NOT EXISTS area_unit TEXT NOT NULL DEFAULT 'ha'
-        CHECK (area_unit = 'ha');
+        CHECK (area_unit = 'ha'),
+    ADD COLUMN IF NOT EXISTS period_kind TEXT NOT NULL DEFAULT 'future_planning'
+        CHECK (period_kind IN ('current_supply', 'future_planning')),
+    ADD COLUMN IF NOT EXISTS reference_sources TEXT,
+    ADD COLUMN IF NOT EXISTS method_note TEXT;
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_crop_references_dataset_period
     ON crop_references (crop_id, geography_id, period_start, period_end, dataset_version);
@@ -40,7 +42,11 @@ ALTER TABLE price_history
 
 ALTER TABLE supply_snapshots
     ADD COLUMN IF NOT EXISTS area_unit TEXT NOT NULL DEFAULT 'ha'
-        CHECK (area_unit = 'ha');
+        CHECK (area_unit = 'ha'),
+    ADD COLUMN IF NOT EXISTS period_kind TEXT NOT NULL DEFAULT 'future_planning'
+        CHECK (period_kind IN ('current_supply', 'future_planning')),
+    ADD COLUMN IF NOT EXISTS reference_sources TEXT,
+    ADD COLUMN IF NOT EXISTS method_note TEXT;
 
 CREATE UNIQUE INDEX IF NOT EXISTS uq_supply_snapshots_dataset_period
     ON supply_snapshots (crop_id, geography_id, period_start, period_end, dataset_version);
@@ -66,8 +72,12 @@ CREATE TABLE IF NOT EXISTS dataset_metadata (
     seed BIGINT NOT NULL,
     manifest_sha256 TEXT NOT NULL,
     metadata JSONB NOT NULL,
+    content_fingerprints JSONB NOT NULL DEFAULT '{}'::jsonb,
     seeded_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE dataset_metadata
+    ADD COLUMN IF NOT EXISTS content_fingerprints JSONB NOT NULL DEFAULT '{}'::jsonb;
 
 CREATE TABLE IF NOT EXISTS demo_scenarios (
     scenario_id TEXT NOT NULL,
@@ -76,6 +86,8 @@ CREATE TABLE IF NOT EXISTS demo_scenarios (
     geography_id BIGINT NOT NULL REFERENCES geographies(id) ON DELETE RESTRICT,
     period_start DATE NOT NULL,
     period_end DATE NOT NULL,
+    period_kind TEXT NOT NULL DEFAULT 'future_planning'
+        CHECK (period_kind = 'future_planning'),
     existing_planned_area_ha NUMERIC(12, 4) NOT NULL CHECK (existing_planned_area_ha >= 0),
     proposed_future_plan_area_ha NUMERIC(12, 4) NOT NULL CHECK (proposed_future_plan_area_ha >= 0),
     reference_area_ha NUMERIC(12, 4) NOT NULL CHECK (reference_area_ha > 0),
@@ -89,10 +101,12 @@ CREATE TABLE IF NOT EXISTS demo_scenarios (
     CHECK (projected_area_ha = existing_planned_area_ha + proposed_future_plan_area_ha)
 );
 
+ALTER TABLE demo_scenarios
+    ADD COLUMN IF NOT EXISTS period_kind TEXT NOT NULL DEFAULT 'future_planning'
+        CHECK (period_kind = 'future_planning');
+
 CREATE INDEX IF NOT EXISTS idx_crop_profiles_dataset_version
     ON crop_profiles (dataset_version, crop_id);
 
 CREATE INDEX IF NOT EXISTS idx_dataset_metadata_data_kind
     ON dataset_metadata (data_kind, dataset_version);
-
-COMMIT;

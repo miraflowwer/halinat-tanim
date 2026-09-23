@@ -238,7 +238,7 @@ Example shape:
   "ratio": 1.6,
   "risk": "high",
   "assumption_version": "grci-v1",
-  "dataset_version": "demo-2026-09-v1",
+  "dataset_version": "demo-2026-09-v2",
   "explanation": "Registered plans are above the current reference level for this period.",
   "alternatives": []
 }

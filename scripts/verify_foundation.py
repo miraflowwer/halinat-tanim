@@ -25,6 +25,7 @@ REQUIRED_FILES = [
     "data/migrations/002_data_foundation.sql",
     "data/dataset_config.json",
     "data/registry/crops.csv",
+    "data/registry/crop_scope_inventory.csv",
     "data/registry/geographies.csv",
     "data/seeds/demo_scenarios.json",
     "data/sources/SOURCES.md",

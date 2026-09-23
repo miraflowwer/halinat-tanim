@@ -56,3 +56,21 @@ The geographic names and codes were loaded from the public PSGC Cloud API as a s
 ## Synthetic data rule
 
 All generated prices, reference areas, planned areas, supply ratios, and soil suitability labels use `data_kind = synthetic_demo`. PSA, DA, Kew, and PSGC Cloud did not publish those generated values. Read the method and unit notes in each generated dataset's `metadata.json`.
+
+## TANIM crop scope inventory
+
+`data/registry/crop_scope_inventory.csv` is the auditable crop universe for the Luzon MVP. The included rows cover food crops used in the current vegetable, fruit, root crop, legume, herb, and spice scope. The inventory keeps aliases and records source context for each inclusion.
+
+The inventory uses the DA Price Monitoring commodity coverage and PSA OpenSTAT commercial crop context as relevant crop list references. Those sources support the inclusion review and naming context. They do not publish the generated profile, area, supply, or suitability values. Rice, corn, plantation crops, livestock, fisheries, ornamentals, and beverage or industrial crops outside the current MVP categories are listed as explicit exclusions with reasons.
+
+## TANIM synthetic method identifiers
+
+The generated rows use method identifiers when an external source did not directly shape a value:
+
+- `TANIM-SYNTH-CROP-PROFILE-V1` supplies simple crop profile text.
+- `TANIM-SYNTH-REFERENCE-AREA-V1` supplies synthetic reference area values.
+- `TANIM-SYNTH-CURRENT-SUPPLY-V1` supplies the September 2026 current map context.
+- `TANIM-SYNTH-FUTURE-SUPPLY-CONTEXT-V1` supplies future planning context rows.
+- `TANIM-SYNTH-SOIL-BASELINE-V1` supplies the synthetic suitability baseline.
+
+These identifiers mean that a documented method informed the model. They never mean that TANIM published or observed the generated number in an external source.

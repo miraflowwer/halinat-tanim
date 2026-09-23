@@ -14,21 +14,26 @@ from typing import Any
 if __package__:
     from scripts.data_common import (
         DEFAULT_CONFIG,
+        DEFAULT_CROP_SCOPE,
         DEFAULT_CROPS,
         DEFAULT_GEOGRAPHIES,
         DEFAULT_SCENARIOS,
         GENERATED_ROOT,
         classify_snapshot_ratio,
+        current_supply_period,
         is_finite_number,
         load_json,
         normalize_label,
         price_months,
         quarter_periods,
         sha256_file,
+        supply_periods,
     )
     from scripts.generate_demo_data import (
         PRICE_FIELDS,
+        PRICE_SOURCE_IDS,
         PROFILE_FIELDS,
+        PROVENANCE_IDS,
         REFERENCE_FIELDS,
         SNAPSHOT_FIELDS,
         SUITABILITY_FIELDS,
@@ -37,21 +42,26 @@ if __package__:
 else:
     from data_common import (
         DEFAULT_CONFIG,
+        DEFAULT_CROP_SCOPE,
         DEFAULT_CROPS,
         DEFAULT_GEOGRAPHIES,
         DEFAULT_SCENARIOS,
         GENERATED_ROOT,
         classify_snapshot_ratio,
+        current_supply_period,
         is_finite_number,
         load_json,
         normalize_label,
         price_months,
         quarter_periods,
         sha256_file,
+        supply_periods,
     )
     from generate_demo_data import (
         PRICE_FIELDS,
+        PRICE_SOURCE_IDS,
         PROFILE_FIELDS,
+        PROVENANCE_IDS,
         REFERENCE_FIELDS,
         SNAPSHOT_FIELDS,
         SUITABILITY_FIELDS,
@@ -78,6 +88,16 @@ CROP_FIELDS = [
     "aliases_tl",
     "active",
 ]
+CROP_SCOPE_FIELDS = [
+    "scope_id",
+    "canonical_name_en",
+    "category",
+    "in_scope",
+    "source_references",
+    "aliases_en",
+    "aliases_tl",
+    "exclusion_reason",
+]
 ALLOWED_CATEGORIES = {"vegetable", "fruit", "root_crop", "legume", "herb", "spice"}
 ALLOWED_LEVELS = {"region", "province", "municipality_city"}
 ALLOWED_SUITABILITY = {"suitable", "moderately_suitable", "low_suitability", "no_data"}
@@ -87,6 +107,14 @@ ID_PATTERNS = {
     "region": re.compile(r"^region_(\d{10})$"),
     "province": re.compile(r"^province_(\d{10})$"),
     "municipality_city": re.compile(r"^mun_(\d{10})$"),
+}
+ALLOWED_PROVENANCE = {
+    "profile": {PROVENANCE_IDS["profile"]},
+    "price": set(PRICE_SOURCE_IDS.split("|")),
+    "reference": {PROVENANCE_IDS["reference"]},
+    "current_supply": {PROVENANCE_IDS["current_supply"]},
+    "future_supply": {PROVENANCE_IDS["future_supply"]},
+    "soil": {PROVENANCE_IDS["soil"]},
 }
 
 
@@ -149,6 +177,73 @@ def validate_crop_registry(rows: list[dict[str, str]], errors: list[str]) -> lis
                 else:
                     aliases[normalized] = crop_id
     return _active_records(rows, "crop registry", errors)
+
+
+def validate_crop_scope_inventory(
+    rows: list[dict[str, str]], registry_rows: list[dict[str, str]], errors: list[str]
+) -> set[str]:
+    scope_ids: set[str] = set()
+    in_scope_ids: set[str] = set()
+    source_ids = {"DA-PRICE-MONITORING", "PSA-OPENSTAT-2M4AFN08"}
+    for row_number, row in enumerate(rows, start=2):
+        scope_id = row.get("scope_id", "").strip()
+        if not re.fullmatch(r"[a-z][a-z0-9_]*", scope_id):
+            errors.append(f"crop scope row {row_number}: invalid scope_id {scope_id!r}")
+        if scope_id in scope_ids:
+            errors.append(f"crop scope row {row_number}: duplicate scope_id {scope_id!r}")
+        scope_ids.add(scope_id)
+        if not row.get("canonical_name_en", "").strip():
+            errors.append(f"crop scope row {row_number}: canonical_name_en is required")
+        try:
+            in_scope = row.get("in_scope", "").strip().lower()
+            if in_scope not in {"true", "false"}:
+                raise ValueError
+        except ValueError:
+            errors.append(f"crop scope row {row_number}: in_scope must be true or false")
+            in_scope = "false"
+        references = {
+            value.strip()
+            for value in row.get("source_references", "").split("|")
+            if value.strip()
+        }
+        if not references or not references.issubset(source_ids):
+            errors.append(
+                f"crop scope row {row_number}: source_references must use the declared crop sources"
+            )
+        if in_scope == "true":
+            in_scope_ids.add(scope_id)
+            if row.get("exclusion_reason", "").strip():
+                errors.append(
+                    f"crop scope row {row_number}: included crop cannot have an exclusion reason"
+                )
+        elif not row.get("exclusion_reason", "").strip():
+            errors.append(f"crop scope row {row_number}: excluded crop needs an exclusion reason")
+    registry_ids = {
+        row.get("crop_id", "").strip()
+        for row in registry_rows
+        if row.get("active", "").strip().lower() == "true"
+    }
+    if in_scope_ids != registry_ids:
+        errors.append(
+            "crop scope inventory and active crop registry disagree: "
+            f"inventory_only={sorted(in_scope_ids - registry_ids)}, "
+            f"registry_only={sorted(registry_ids - in_scope_ids)}"
+        )
+    return in_scope_ids
+
+
+def _provenance_ids(value: str) -> set[str]:
+    return {item.strip() for item in value.split("|") if item.strip()}
+
+
+def _check_provenance(
+    value: str, allowed: set[str], label: str, row_number: int, errors: list[str]
+) -> None:
+    values = _provenance_ids(value)
+    if not values or not values.issubset(allowed):
+        errors.append(
+            f"{label} row {row_number}: malformed provenance IDs; allowed IDs are {sorted(allowed)}"
+        )
 
 
 def validate_geography_registry(
@@ -340,6 +435,8 @@ def _verify_scenarios(
             errors.append(f"{label}: geography_id must identify a supported municipality or city")
         if scenario.get("data_kind") != DATA_KIND:
             errors.append(f"{label}: data_kind must be {DATA_KIND!r}")
+        if scenario.get("period_kind") != "future_planning":
+            errors.append(f"{label}: period_kind must be 'future_planning'")
         start_value = scenario.get("period_start", "")
         end_value = scenario.get("period_end", "")
         if not isinstance(start_value, str) or not isinstance(end_value, str):
@@ -350,7 +447,7 @@ def _verify_scenarios(
         if start and end and start > end:
             errors.append(f"{label}: period_end is before period_start")
         if (start_value, end_value) not in periods:
-            errors.append(f"{label}: period must match a configured reference period")
+            errors.append(f"{label}: period is outside the supported future planning horizon")
         try:
             existing_area = float(scenario["existing_planned_area_ha"])
             proposed_area = float(scenario["proposed_future_plan_area_ha"])
@@ -436,6 +533,7 @@ def validate_dataset(
     dataset_dir: Path | None = None,
     scenarios_path: Path | None = DEFAULT_SCENARIOS,
     check_determinism: bool = False,
+    crop_scope_path: Path | None = None,
 ) -> tuple[list[str], dict[str, Any]]:
     errors: list[str] = []
     try:
@@ -449,10 +547,26 @@ def validate_dataset(
     _missing_fields(crop_fields, CROP_FIELDS, "crop registry", errors)
     _missing_fields(geography_fields, GEOGRAPHY_FIELDS, "geography registry", errors)
     active_crops = validate_crop_registry(crops, errors)
+    scope_path = crop_scope_path
+    if scope_path is None and crops_path.resolve() == DEFAULT_CROPS.resolve():
+        scope_path = DEFAULT_CROP_SCOPE
+    scope_ids: set[str] = {row.get("crop_id", "") for row in active_crops}
+    if scope_path is not None:
+        if not scope_path.is_file():
+            errors.append(f"required crop scope inventory is missing: {scope_path}")
+        else:
+            try:
+                scope_fields, scope_rows = read_csv_document(scope_path)
+                _missing_fields(scope_fields, CROP_SCOPE_FIELDS, "crop scope inventory", errors)
+                scope_ids = validate_crop_scope_inventory(scope_rows, crops, errors)
+            except (OSError, csv.Error) as error:
+                errors.append(f"cannot read crop scope inventory: {error}")
     active_geographies = validate_geography_registry(geographies, errors)
     if not active_crops:
         errors.append("crop registry must contain at least one active crop")
     active_crop_ids = {row["crop_id"] for row in active_crops}
+    if scope_path is not None and scope_ids != active_crop_ids:
+        errors.append("active crop coverage must be defined by the crop scope inventory")
     active_geography_by_id = {row["geography_id"]: row for row in active_geographies}
     active_municipalities = [
         row for row in active_geographies if row["level"] == "municipality_city"
@@ -465,11 +579,15 @@ def validate_dataset(
     ]
     version = str(config.get("dataset_version", ""))
     try:
-        periods = quarter_periods(config)
+        current_period = current_supply_period(config)
+        future_periods = quarter_periods(config)
+        configured_supply_periods = supply_periods(config)
         months = price_months(config)
     except (KeyError, TypeError, ValueError) as error:
         errors.append(f"invalid dataset configuration: {error}")
-        periods = []
+        current_period = ("", "")
+        future_periods = []
+        configured_supply_periods = []
         months = []
     thresholds = config.get("snapshot_thresholds", {})
     try:
@@ -510,6 +628,9 @@ def validate_dataset(
         input_checksums = {}
     if input_checksums.get("crops.csv") != sha256_file(crops_path):
         errors.append("metadata crop registry checksum does not match the canonical crop registry")
+    if scope_path is not None and scope_path.is_file():
+        if input_checksums.get("crop_scope_inventory.csv") != sha256_file(scope_path):
+            errors.append("metadata crop scope checksum does not match the crop scope inventory")
     if input_checksums.get("geographies.csv") != sha256_file(geographies_path):
         errors.append(
             "metadata geography registry checksum does not match the canonical geography registry"
@@ -553,6 +674,83 @@ def validate_dataset(
         errors.append(
             f"metadata coverage counts do not match registries: expected {expected_counts}"
         )
+    metadata_periods = metadata.get("periods", {})
+    if not isinstance(metadata_periods, dict):
+        errors.append("metadata periods must be an object")
+        metadata_periods = {}
+    current_metadata = metadata_periods.get("current_supply", {})
+    if not isinstance(current_metadata, dict):
+        current_metadata = {}
+    if (
+        current_metadata.get("period_start") != current_period[0]
+        or current_metadata.get("period_end") != current_period[1]
+    ):
+        errors.append("metadata current supply period does not match dataset_config.json")
+    metadata_future = metadata_periods.get("future_planning", {})
+    if not isinstance(metadata_future, dict):
+        metadata_future = {}
+    expected_future_rows = [
+        {"period_start": start, "period_end": end, "period_kind": "future_planning"}
+        for start, end in future_periods
+    ]
+    if metadata_future.get("periods") != expected_future_rows:
+        errors.append("metadata future planning periods do not match dataset_config.json")
+    time_contract = metadata.get("time_contract", {})
+    current_contract = (
+        time_contract.get("current_supply_period", {})
+        if isinstance(time_contract, dict)
+        else {}
+    )
+    if not isinstance(current_contract, dict):
+        current_contract = {}
+    if (
+        not isinstance(time_contract, dict)
+        or current_contract.get("kind") != "current_supply"
+    ):
+        errors.append("metadata must declare a current_supply time contract")
+    horizon = (
+        time_contract.get("future_planning_horizon", {})
+        if isinstance(time_contract, dict)
+        else {}
+    )
+    if not isinstance(horizon, dict):
+        horizon = {}
+    configured_horizon = config.get("periods", {}).get("future_planning", {})
+    if (
+        horizon.get("start") != configured_horizon.get("start")
+        or horizon.get("end") != configured_horizon.get("end")
+    ):
+        errors.append("metadata future planning horizon does not match dataset_config.json")
+    provenance = metadata.get("provenance", {})
+    if not isinstance(provenance, dict):
+        errors.append("metadata provenance must be an object")
+    else:
+        required_provenance_tables = {
+            "crop_profiles",
+            "price_history",
+            "crop_references",
+            "supply_snapshots",
+            "soil_suitability",
+        }
+        if not required_provenance_tables.issubset(provenance):
+            errors.append("metadata provenance must document every generated dataset")
+        expected_metadata_sources = {
+            "crop_profiles": ALLOWED_PROVENANCE["profile"],
+            "price_history": ALLOWED_PROVENANCE["price"],
+            "crop_references": ALLOWED_PROVENANCE["reference"],
+            "supply_snapshots": (
+                ALLOWED_PROVENANCE["current_supply"]
+                | ALLOWED_PROVENANCE["future_supply"]
+            ),
+            "soil_suitability": ALLOWED_PROVENANCE["soil"],
+        }
+        for table_name, allowed_sources in expected_metadata_sources.items():
+            entry = provenance.get(table_name, {})
+            source_values = entry.get("source_ids", []) if isinstance(entry, dict) else []
+            if not isinstance(source_values, list) or not set(source_values).issubset(
+                allowed_sources
+            ):
+                errors.append(f"metadata provenance has invalid source IDs for {table_name}")
 
     expected_files = {
         "crop_profiles.csv": PROFILE_FIELDS,
@@ -622,6 +820,16 @@ def validate_dataset(
         ):
             if not row.get(field, "").strip():
                 errors.append(f"crop_profiles.csv has an empty required profile field: {field}")
+    for row_number, row in enumerate(profiles, start=2):
+        _check_provenance(
+            row.get("reference_sources", ""),
+            ALLOWED_PROVENANCE["profile"],
+            "crop_profiles.csv",
+            row_number,
+            errors,
+        )
+    if len({row.get("summary_en", "") for row in profiles}) < min(3, len(active_crop_ids)):
+        errors.append("crop profiles must contain crop-specific overview text")
 
     prices = tables["price_history.csv"]
     price_keys = _check_unique(
@@ -641,6 +849,13 @@ def validate_dataset(
     previous_price_key: tuple[str, str, str] | None = None
     valid_price_dates: dict[tuple[str, str], list[date]] = {}
     for row_number, row in enumerate(prices, start=2):
+        _check_provenance(
+            row.get("reference_sources", ""),
+            ALLOWED_PROVENANCE["price"],
+            "price_history.csv",
+            row_number,
+            errors,
+        )
         geography = active_geography_by_id.get(row.get("geography_id", ""))
         if geography and geography.get("level") not in {"province", "region"}:
             errors.append(
@@ -677,7 +892,7 @@ def validate_dataset(
         (crop_id, geography["geography_id"], start, end, version)
         for crop_id in active_crop_ids
         for geography in active_municipalities
-        for start, end in periods
+        for start, end, _kind in configured_supply_periods
     }
     if reference_keys != expected_reference_keys:
         errors.append(
@@ -686,7 +901,10 @@ def validate_dataset(
             f"{len(reference_keys)} natural keys found)"
         )
     reference_by_key: dict[tuple[str, str, str, str], str] = {}
-    period_lookup = set(periods)
+    period_lookup = {(start, end) for start, end, _kind in configured_supply_periods}
+    period_kind_lookup = {
+        (start, end): kind for start, end, kind in configured_supply_periods
+    }
     for row_number, row in enumerate(references, start=2):
         start = _parse_iso_date(
             row.get("period_start", ""), "crop_references.csv", row_number, errors
@@ -696,9 +914,16 @@ def validate_dataset(
             errors.append(
                 f"crop_references.csv row {row_number}: period_end is before period_start"
             )
-        if (row.get("period_start"), row.get("period_end")) not in period_lookup:
+        period_key = (row.get("period_start"), row.get("period_end"))
+        if period_key not in period_lookup:
             errors.append(
-                f"crop_references.csv row {row_number}: period does not match configured quarter"
+                f"crop_references.csv row {row_number}: period is outside the "
+                "supported time contract"
+            )
+        elif row.get("period_kind") != period_kind_lookup[period_key]:
+            errors.append(
+                f"crop_references.csv row {row_number}: period_kind must be "
+                f"{period_kind_lookup[period_key]!r}"
             )
         if row.get("area_unit") != "ha":
             errors.append(f"crop_references.csv row {row_number}: area_unit must be ha")
@@ -708,6 +933,13 @@ def validate_dataset(
                 f"crop_references.csv row {row_number}: reference_area_ha must be finite "
                 "and positive"
             )
+        _check_provenance(
+            row.get("reference_sources", ""),
+            ALLOWED_PROVENANCE["reference"],
+            "crop_references.csv",
+            row_number,
+            errors,
+        )
         reference_by_key[
             (
                 row.get("crop_id", ""),
@@ -740,9 +972,27 @@ def validate_dataset(
             errors.append(
                 f"supply_snapshots.csv row {row_number}: period_end is before period_start"
             )
-        if (row.get("period_start"), row.get("period_end")) not in period_lookup:
+        period_key = (row.get("period_start"), row.get("period_end"))
+        if period_key not in period_lookup:
             errors.append(
-                f"supply_snapshots.csv row {row_number}: period does not match configured quarter"
+                f"supply_snapshots.csv row {row_number}: period is outside the "
+                "supported time contract"
+            )
+        else:
+            expected_kind = period_kind_lookup[period_key]
+            if row.get("period_kind") != expected_kind:
+                errors.append(
+                    f"supply_snapshots.csv row {row_number}: period_kind must be {expected_kind!r}"
+                )
+            provenance_key = (
+                "current_supply" if expected_kind == "current_supply" else "future_supply"
+            )
+            _check_provenance(
+                row.get("reference_sources", ""),
+                ALLOWED_PROVENANCE[provenance_key],
+                "supply_snapshots.csv",
+                row_number,
+                errors,
             )
         if row.get("area_unit") != "ha":
             errors.append(f"supply_snapshots.csv row {row_number}: area_unit must be ha")
@@ -823,6 +1073,13 @@ def validate_dataset(
                 f"soil_suitability.csv row {row_number}: invalid suitability_class "
                 f"{row.get('suitability_class')!r}"
             )
+        _check_provenance(
+            row.get("reference_sources", ""),
+            ALLOWED_PROVENANCE["soil"],
+            "soil_suitability.csv",
+            row_number,
+            errors,
+        )
 
     for table_name in ("crop_references.csv", "supply_snapshots.csv", "soil_suitability.csv"):
         for row_number, row in enumerate(tables[table_name], start=2):
@@ -840,7 +1097,7 @@ def validate_dataset(
             active_geography_by_id,
             reference_by_key,
             snapshot_by_key,
-            period_lookup,
+            {(start, end) for start, end in future_periods},
             thresholds,
             errors,
         )
@@ -853,6 +1110,12 @@ def validate_dataset(
         "provinces": len(active_provinces),
         "municipalities_cities": len(active_municipalities),
         "generated_rows": {filename: len(rows) for filename, rows in tables.items()},
+        "current_supply_period": current_period,
+        "supported_future_planning_periods": future_periods,
+        "supported_future_planning_horizon": {
+            "start": config.get("periods", {}).get("future_planning", {}).get("start"),
+            "end": config.get("periods", {}).get("future_planning", {}).get("end"),
+        },
         "path": str(target),
     }
     if check_determinism and not errors:
@@ -865,6 +1128,8 @@ def validate_dataset(
                     config_path,
                     root / "first",
                     scenarios_path,
+                    False,
+                    scope_path,
                 )
                 second = generate_dataset(
                     crops_path,
@@ -872,6 +1137,8 @@ def validate_dataset(
                     config_path,
                     root / "second",
                     scenarios_path,
+                    False,
+                    scope_path,
                 )
                 if first["metadata"]["files"] != second["metadata"]["files"]:
                     errors.append("generator determinism check failed: output manifests differ")
@@ -893,6 +1160,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--crop-registry", type=Path, default=DEFAULT_CROPS)
     parser.add_argument("--geography-registry", type=Path, default=DEFAULT_GEOGRAPHIES)
+    parser.add_argument("--crop-scope", type=Path, default=DEFAULT_CROP_SCOPE)
     parser.add_argument("--scenarios", type=Path, default=DEFAULT_SCENARIOS)
     parser.add_argument("--dataset-dir", type=Path)
     parser.add_argument("--check-determinism", action="store_true", default=True)
@@ -909,6 +1177,7 @@ def main(argv: list[str] | None = None) -> int:
         args.dataset_dir,
         args.scenarios,
         args.check_determinism,
+        args.crop_scope,
     )
     if errors:
         print("TANIM data validation failed:")

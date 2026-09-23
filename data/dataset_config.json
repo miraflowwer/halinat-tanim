@@ -1,16 +1,29 @@
 {
-  "dataset_version": "demo-2026-09-v1",
+  "dataset_version": "demo-2026-09-v2",
   "seed": 20260924,
-  "generation_version": "1.0.0",
+  "generation_version": "2.0.0",
   "periods": {
+    "current_supply": {
+      "start": "2026-09-01",
+      "end": "2026-09-30"
+    },
     "price_start_month": "2023-09",
     "price_month_count": 36,
-    "reference_quarter_starts": [
-      "2027-01-01",
-      "2027-04-01",
-      "2027-07-01",
-      "2027-10-01"
-    ]
+    "future_planning": {
+      "start": "2027-01-01",
+      "end": "2028-12-31",
+      "period_granularity": "quarter",
+      "quarter_starts": [
+        "2027-01-01",
+        "2027-04-01",
+        "2027-07-01",
+        "2027-10-01",
+        "2028-01-01",
+        "2028-04-01",
+        "2028-07-01",
+        "2028-10-01"
+      ]
+    }
   },
   "snapshot_thresholds": {
     "low_below": 0.9,
