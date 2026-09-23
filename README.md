@@ -30,6 +30,25 @@ TANIM is a local-first crop planning and coordination platform for farmers and c
 - `scripts/` contains local development and verification scripts.
 - `tests/` contains cross-project tests.
 
+## Data foundation
+
+The canonical crop and Luzon geography registries are in `data/registry/`. The fixed seed, dataset version, and periods are in `data/dataset_config.json`.
+
+Run the data generator and validator with:
+
+```text
+python scripts/generate_demo_data.py
+python scripts/validate_data.py
+```
+
+To load the validated dataset into the local PostgreSQL database, set `DATABASE_URL` in `.env` and run:
+
+```text
+python scripts/seed_data.py
+```
+
+Read [the data foundation notes](data/sources/DATA_FOUNDATION.md) and [the source notes](data/sources/SOURCES.md) for coverage, units, methods, and limits.
+
 ## Start TANIM
 
 On Windows, double-click `TANIM.bat`.
@@ -49,7 +68,7 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe scripts/init_db.py
 ```
 
-The database command checks the connection and applies `data/migrations/001_foundation.sql` in a transaction. It can be run again safely. After setup, `npm run db:init` runs the same command using the local `.venv`.
+The database command checks the connection and applies all numbered migrations in order. It can be run again safely. After setup, `npm run db:init` runs the same command using the local `.venv`.
 
 ## Stop TANIM
 

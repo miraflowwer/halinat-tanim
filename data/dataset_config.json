@@ -1,0 +1,19 @@
+{
+  "dataset_version": "demo-2026-09-v1",
+  "seed": 20260924,
+  "generation_version": "1.0.0",
+  "periods": {
+    "price_start_month": "2023-09",
+    "price_month_count": 36,
+    "reference_quarter_starts": [
+      "2027-01-01",
+      "2027-04-01",
+      "2027-07-01",
+      "2027-10-01"
+    ]
+  },
+  "snapshot_thresholds": {
+    "low_below": 0.9,
+    "high_above": 1.1
+  }
+}

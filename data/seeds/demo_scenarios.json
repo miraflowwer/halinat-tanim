@@ -1,0 +1,34 @@
+{
+  "schema_version": "1",
+  "method_note": "Projected ratio equals (existing planned area + proposed area) / reference area.",
+  "scenarios": [
+    {
+      "scenario_id": "tomato_cabanatuan_2027_q1",
+      "crop_id": "tomato",
+      "geography_id": "mun_0304903000",
+      "period_start": "2027-01-01",
+      "period_end": "2027-03-31",
+      "existing_planned_area_ha": 32,
+      "proposed_future_plan_area_ha": 8,
+      "reference_area_ha": 25,
+      "projected_area_ha": 40,
+      "expected_future_ratio": 1.6,
+      "expected_future_risk": "high",
+      "data_kind": "synthetic_demo"
+    },
+    {
+      "scenario_id": "eggplant_cabanatuan_lower_pressure_2027_q1",
+      "crop_id": "eggplant",
+      "geography_id": "mun_0304903000",
+      "period_start": "2027-01-01",
+      "period_end": "2027-03-31",
+      "existing_planned_area_ha": 12,
+      "proposed_future_plan_area_ha": 0,
+      "reference_area_ha": 18,
+      "projected_area_ha": 12,
+      "expected_future_ratio": 0.666667,
+      "expected_future_risk": "low",
+      "data_kind": "synthetic_demo"
+    }
+  ]
+}

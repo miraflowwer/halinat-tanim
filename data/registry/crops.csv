@@ -1,0 +1,36 @@
+crop_id,canonical_name_en,canonical_name_tl,scientific_name,category,aliases_en,aliases_tl,active
+avocado,Avocado,Abokado,Persea americana,fruit,alligator pear,,true
+banana,Banana,Saging,Musa acuminata,fruit,,,true
+basil,Basil,Balanoy,Ocimum basilicum,herb,sweet basil,,true
+bell_pepper,Bell pepper,Pamintang kampana,Capsicum annuum Group Grossum,vegetable,sweet pepper,,true
+bitter_gourd,Bitter gourd,Ampalaya,Momordica charantia,vegetable,bitter melon,,true
+broccoli,Broccoli,Brokoli,Brassica oleracea var. italica,vegetable,,,true
+cabbage,Cabbage,Repolyo,Brassica oleracea var. capitata,vegetable,headed cabbage,,true
+calamansi,Calamansi,Kalamansi,Citrus × microcarpa,fruit,calamondin,,true
+carrot,Carrot,Karot,Daucus carota subsp. sativus,vegetable,,,true
+cassava,Cassava,Kamoteng kahoy,Manihot esculenta,root_crop,manioc,,true
+cauliflower,Cauliflower,Koliplor,Brassica oleracea var. botrytis,vegetable,,,true
+chili_pepper,Chili pepper,Sili,Capsicum frutescens,vegetable,hot pepper,,true
+cucumber,Cucumber,Pipino,Cucumis sativus,vegetable,,,true
+eggplant,Eggplant,Talong,Solanum melongena,vegetable,aubergine,,true
+garlic,Garlic,Bawang,Allium sativum,vegetable,,,true
+ginger,Ginger,Luya,Zingiber officinale,spice,,,true
+guava,Guava,Bayabas,Psidium guajava,fruit,,,true
+lettuce,Lettuce,Letsugas,Lactuca sativa,vegetable,,,true
+lemongrass,Lemongrass,Tanglad,Cymbopogon citratus,herb,lemon grass,,true
+mango,Mango,Mangga,Mangifera indica,fruit,,,true
+mung_bean,Mung bean,Monggo,Vigna radiata,legume,green gram,,true
+okra,Okra,Okra,Abelmoschus esculentus,vegetable,lady's finger,,true
+onion,Onion,Sibuyas,Allium cepa,vegetable,bulb onion,,true
+papaya,Papaya,Papaya,Carica papaya,fruit,,,true
+peanut,Peanut,Mani,Arachis hypogaea,legume,groundnut,,true
+pechay,Pechay,Pechay,Brassica rapa subsp. chinensis,vegetable,pak choi|bok choy,,true
+pineapple,Pineapple,Pinya,Ananas comosus,fruit,,,true
+purple_yam,Purple yam,Ube,Dioscorea alata,root_crop,,,true
+squash,Squash,Kalabasa,Cucurbita moschata,vegetable,,,true
+string_bean,String bean,Sitaw,Vigna unguiculata subsp. sesquipedalis,vegetable,yardlong bean,,true
+sweet_potato,Sweet potato,Kamote,Ipomoea batatas,root_crop,,,true
+taro,Taro,Gabi,Colocasia esculenta,root_crop,,,true
+tomato,Tomato,Kamatis,Solanum lycopersicum,vegetable,garden tomato,,true
+turmeric,Turmeric,Luyang dilaw,Curcuma longa,spice,,,true
+watermelon,Watermelon,Pakwan,Citrullus lanatus,fruit,,,true

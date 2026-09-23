@@ -1,0 +1,113 @@
+{
+  "canonical_units": {
+    "planned_area": "ha",
+    "price_history": {
+      "currency": "PHP",
+      "unit": "PHP/kg"
+    },
+    "ratio": "dimensionless decimal",
+    "reference_area": "ha"
+  },
+  "coverage": {
+    "prices": "36 monthly points per active crop and province, plus NCR",
+    "profiles": "one row for each active crop",
+    "reference_supply": "one row per active crop, city or municipality, and quarter",
+    "soil_suitability": "one row per active crop and city or municipality",
+    "supply_snapshots": "one row per active crop, city or municipality, and quarter"
+  },
+  "data_kind": "synthetic_demo",
+  "dataset_version": "demo-2026-09-v1",
+  "files": {
+    "crop_profiles.csv": {
+      "row_count": 35,
+      "sha256": "f798dcff3f3ea06e7c81bf142f67ef5be8762c0d316de4ab7e03357f65ced03b"
+    },
+    "crop_references.csv": {
+      "row_count": 107940,
+      "sha256": "1c7832bc8e260c2b7fb633e77586fe3a29003c2195eb18b82a4b75c1b2e72da0"
+    },
+    "price_history.csv": {
+      "row_count": 49140,
+      "sha256": "8604b6e7da2c2c1ba61872dc9fa76a0ba591ba29b95d6604931155008cc30115"
+    },
+    "soil_suitability.csv": {
+      "row_count": 26985,
+      "sha256": "c211581cf7755f9bf3fa3a101ec7514054066bb76924af618e069676b2f60892"
+    },
+    "supply_snapshots.csv": {
+      "row_count": 107940,
+      "sha256": "801d1c2f7164ebc614ce0e67f74a60d86713fc5ff9ce721f05ad8a37e392447c"
+    }
+  },
+  "generation_version": "1.0.0",
+  "geographic_scope": {
+    "barangay_level_included": false,
+    "country": "Philippines",
+    "counts": {
+      "active_crops": 35,
+      "municipalities_cities": 771,
+      "provinces": 38,
+      "regions": 8
+    },
+    "island_group": "Luzon",
+    "levels": [
+      "region",
+      "province",
+      "municipality_city"
+    ],
+    "parent_note": "NCR cities and Pateros link directly to NCR because PSGC does not define provinces within NCR."
+  },
+  "input_sha256": {
+    "crops.csv": "2f23a06a28ca3b20445360abcc9d9bb445025b3d2b50ec6e2b0da7d6d6909086",
+    "demo_scenarios.json": "eb34e950e0209590dbc7e0c7dd0eab78ee4e21d833e02223b847cd5178f5a0b3",
+    "geographies.csv": "81b0566e09feb8df6216c2c9bdd9413d175312a59d00a955b3449f4ebeb2be0a"
+  },
+  "method_notes": [
+    "All agricultural numeric values are deterministic synthetic demo values.",
+    "Price ranges use manually set crop-category baselines, stable location factors, a smooth trend, seasonal factors, and small bounded variation. Baselines are not statistically calibrated to source publications.",
+    "Area values use broad crop-category baselines and stable crop, location, and period factors.",
+    "Soil suitability labels use a separate deterministic allocation. They are not market supply scores or measured soil results.",
+    "Public sources inform data structure, crop naming, geography, crop coverage, and suitability concepts. They do not publish these generated values."
+  ],
+  "periods": {
+    "price_history_end": "2026-08-01",
+    "price_history_start": "2023-09-01",
+    "reference_periods": [
+      {
+        "period_end": "2027-03-31",
+        "period_start": "2027-01-01"
+      },
+      {
+        "period_end": "2027-06-30",
+        "period_start": "2027-04-01"
+      },
+      {
+        "period_end": "2027-09-30",
+        "period_start": "2027-07-01"
+      },
+      {
+        "period_end": "2027-12-31",
+        "period_start": "2027-10-01"
+      }
+    ],
+    "reference_supply_end": "2027-12-31",
+    "reference_supply_start": "2027-01-01"
+  },
+  "reference_sources": [
+    "PSGC-Q2-2026",
+    "PSA-OPENSTAT-2M4AFN08",
+    "DA-PRICE-MONITORING",
+    "Kew-Plants-of-the-World-Online"
+  ],
+  "seed": 20260924,
+  "snapshot_formula": {
+    "ratio": "planned_area_ha / reference_area_ha, rounded to 6 decimal places",
+    "risk_labels": {
+      "high": "ratio > 1.1",
+      "low": "ratio < 0.9",
+      "moderate": "0.9 <= ratio <= 1.1",
+      "no_data": "reference area is missing or invalid"
+    },
+    "scope_note": "This formula labels synthetic context snapshots only, not Phase 3 risk results."
+  }
+}
