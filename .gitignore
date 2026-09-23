@@ -1,0 +1,54 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+dist/
+build/
+coverage/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# TANIM local runtime
+.tanim/runtime/
+.tanim/logs/
+
+# Local database or exports
+*.dump
+*.backup
+*.sqlite
+*.sqlite3
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+~$*
+
+# Impeccable runtime artifacts
+# Keep shared Impeccable configuration when it is later created.
+.impeccable/cache/
+.impeccable/screenshots/
+.impeccable/sessions/
+.impeccable/tmp/
