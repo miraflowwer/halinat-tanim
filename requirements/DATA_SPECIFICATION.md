@@ -164,11 +164,13 @@ Provenance must still be available through metadata and documentation.
 
 Use a readable dataset version such as:
 
-`demo-2026-09-v1`
+`demo-2026-09-v3`
 
 When data meaning, generation logic, or a major input changes, create a new version.
 
 Do not silently replace an existing version with different values.
+
+The generated agricultural package must declare a current supply context period separately from future planning periods. The current supply period supports the map context. Future planning periods are a complete, centrally configured horizon. A caller must be able to identify an unsupported harvest period without extrapolating it.
 
 ## 10. Deterministic generation
 

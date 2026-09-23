@@ -1,3 +1,4 @@
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -21,10 +22,23 @@ REQUIRED_FILES = [
     "requirements/DATA_SPECIFICATION.md",
     "requirements/PHASE_1_FOUNDATION.md",
     "data/migrations/001_foundation.sql",
+    "data/migrations/002_data_foundation.sql",
+    "data/dataset_config.json",
+    "data/registry/crops.csv",
+    "data/registry/crop_scope_inventory.csv",
+    "data/registry/geographies.csv",
+    "data/seeds/demo_scenarios.json",
+    "data/sources/SOURCES.md",
+    "data/sources/DATA_FOUNDATION.md",
     "scripts/start-tanim.ps1",
     "scripts/stop-tanim.ps1",
     "scripts/check-health.ps1",
     "scripts/init_db.py",
+    "scripts/__init__.py",
+    "scripts/data_common.py",
+    "scripts/generate_demo_data.py",
+    "scripts/validate_data.py",
+    "scripts/seed_data.py",
     "scripts/smoke_api.py",
     "scripts/run-python.mjs",
     "scripts/run-frontends.ps1",
@@ -56,6 +70,26 @@ REQUIRED_DIRS = [
 ]
 
 missing = []
+
+config_path = ROOT / "data" / "dataset_config.json"
+if config_path.is_file():
+    with config_path.open(encoding="utf-8") as config_file:
+        dataset_version = json.load(config_file).get("dataset_version")
+    if isinstance(dataset_version, str) and dataset_version:
+        generated_dir = Path("data") / "generated" / dataset_version
+        REQUIRED_FILES.extend(
+            (generated_dir / name).as_posix()
+            for name in [
+                "crop_profiles.csv.gz",
+                "price_history.csv.gz",
+                "crop_references.csv.gz",
+                "supply_snapshots.csv.gz",
+                "soil_suitability.csv.gz",
+                "metadata.json",
+            ]
+        )
+    else:
+        missing.append("data/dataset_config.json must define a dataset_version")
 
 for item in REQUIRED_FILES:
     if not (ROOT / item).is_file():

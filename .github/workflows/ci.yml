@@ -1,0 +1,80 @@
+name: TANIM CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      DATABASE_URL: postgresql://tanim:tanim@localhost:5432/tanim
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: tanim
+          POSTGRES_PASSWORD: tanim
+          POSTGRES_DB: tanim
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tanim -d tanim"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Python dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -e ".[dev]"
+
+      - name: Install JavaScript dependencies
+        run: npm ci
+
+      - name: Generate the configured data version
+        run: npm run data:generate
+
+      - name: Verify foundation files
+        run: npm run verify:foundation
+
+      - name: Validate registries, data, provenance, and determinism
+        run: npm run data:validate
+
+      - name: Run JavaScript and Python tests
+        run: npm test
+
+      - name: Run linters
+        run: npm run lint
+
+      - name: Build frontend workspaces
+        run: npm run build
+
+      - name: Smoke test API health behavior
+        run: npm run smoke:api
+
+      - name: Apply PostgreSQL migrations and seed data
+        run: npm run data:seed
+
+      - name: Verify repeat seeding and database fingerprints
+        run: npm run data:seed

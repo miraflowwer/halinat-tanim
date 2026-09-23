@@ -1,0 +1,122 @@
+scope_id,canonical_name_en,category,in_scope,source_references,aliases_en,aliases_tl,exclusion_reason
+abaca,Abaca,plantation,false,PSA-QUEZON-CRPS-2022,,,PSA crop classification places this fiber commodity outside the current food-crop scope
+anthurium,Anthurium,ornamental,false,PSA-QUEZON-CRPS-2022,,,ornamental production is outside the current food-crop scope
+arrowroot,Arrowroot,root_crop,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,araro,Araro,
+atis,Sugar apple,fruit,true,PSA-QUEZON-CRPS-2022,atis|sweetsop,Atis,
+avocado,Avocado,fruit,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,alligator pear,Abokado,
+bamboo_shoots,Bamboo shoots,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,bamboo shoot|labong,Labong,
+banana,Banana,fruit,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,,Saging,
+banana_blossom,Banana blossom,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,banana flower|banana heart,Puso ng saging,
+banana_leaves,Banana leaves,plant_product,false,PSA-QUEZON-CRPS-2022,,,leaves are not a food crop-planning commodity in this MVP
+bangus,Bangus,aquaculture,false,DA-PRICE-MONITORING,,,fisheries are outside the current crop scope
+basil,Basil,herb,true,DA-PRICE-MONITORING,sweet basil,Balanoy,
+bell_pepper,Bell pepper,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,sweet pepper,Pamintang kampana,
+bitter_gourd,Bitter gourd,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,bitter melon,Ampalaya,
+bottle_gourd,Bottle gourd,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,gourd|upo,Upo,
+broccoli,Broccoli,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING,,Brokoli,
+bromeliad,Bromeliad,ornamental,false,PSA-QUEZON-CRPS-2022,,,ornamental production is outside the current food-crop scope
+cabbage,Cabbage,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,headed cabbage,Repolyo,
+cacao,Cacao,beverage,false,DA-PRICE-MONITORING|PSA-QUEZON-CRPS-2022,,,beverage crop is outside the current MVP category scope
+calamansi,Calamansi,fruit,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,calamondin,Kalamansi,
+camansi,Breadnut,fruit,true,PSA-QUEZON-CRPS-2022,camansi fruit|seeded breadfruit,Camansi,
+camote_tops,Sweet potato tops,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,camote tops|kamote tops|sweet potato leaves,Talbos ng kamote,
+carrot,Carrot,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Karot,
+cassava,Cassava,root_crop,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,manioc,Kamoteng kahoy,
+cattle,Cattle,livestock,false,DA-PRICE-MONITORING,,,livestock is outside the crop scope
+cauliflower,Cauliflower,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING,,Koliplor,
+celery,Celery,vegetable,true,DA-AMAS-PM-2026-02-25|PSA-QUEZON-CRPS-2022,kinchay|chinese celery|celery stalk,Kintsay,
+chayote,Chayote,vegetable,true,DA-AMAS-PM-2026-02-25|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,chayote fruit|sayote,Sayote,
+chicken,Chicken,livestock,false,DA-PRICE-MONITORING,,,livestock is outside the crop scope
+chico,Sapodilla,fruit,true,PSA-QUEZON-CRPS-2022,chico|sapodilla,Chico,
+chili_leaves,Chili leaves,vegetable,true,PSA-QUEZON-CRPS-2022,chili pepper leaves|pepper chili leaves|sili leaves,Dahon ng sili,
+chili_pepper,Chili pepper,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,hot pepper,Sili,
+chinese_cabbage,Chinese cabbage,vegetable,true,PSA-BENGUET-CRPS-2025-Q1|PSA-BENGUET-HV-2025-H1|Kew-Plants-of-the-World-Online,napa cabbage|wombok,Repolyong Tsino,
+coconut,Coconut,plantation,false,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,,,plantation commodity is outside the current horticultural MVP scope
+coconut_leaves,Coconut leaves,plantation,false,PSA-QUEZON-CRPS-2022,,,coconut plantation product is outside the current MVP crop scope
+coconut_pith,Coconut pith,plantation,false,PSA-QUEZON-CRPS-2022,,,coconut plantation product is outside the current MVP crop scope
+coconut_sap,Coconut sap or tuba,plantation,false,PSA-QUEZON-CRPS-2022,,,coconut plantation product is outside the current MVP crop scope
+coffee,Coffee,beverage,false,DA-PRICE-MONITORING|PSA-QUEZON-CRPS-2022,,,beverage crop is outside the current MVP category scope
+corn,Corn,grain,false,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,grain commodity is outside the current horticultural MVP scope
+cowpea,Cowpea,legume,true,PSA-QUEZON-CRPS-2022,black-eyed pea|cowpea,Cowpea,
+cucumber,Cucumber,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Pipino,
+cut_flower,Cut flower,ornamental,false,DA-PRICE-MONITORING,,,ornamental production is outside the current food crop scope
+daisy,Daisy,ornamental,false,PSA-QUEZON-CRPS-2022,,,ornamental production is outside the current food-crop scope
+dragon_fruit,Dragon fruit,fruit,true,PSA-QUEZON-CRPS-2022,pitaya|dragon fruit,Dragon fruit,
+duhat,Java plum,fruit,true,PSA-QUEZON-CRPS-2022,duhat|jamun,Duhat,
+eggplant,Eggplant,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,aubergine,Talong,
+garlic,Garlic,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,Bawang,
+ginger,Ginger,spice,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Luya,
+green_corn_stalk,Green corn stalk,staple_crop,false,PSA-QUEZON-CRPS-2022,,,stalk commodity is outside the current horticultural food-crop scope
+green_papaya,Green papaya,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,unripe papaya|green papaya fruit,Papayang hilaw,
+guava,Guava,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,,Bayabas,
+habichuelas,Baguio beans,vegetable,true,DA-AMAS-PM-2026-02-25|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,habichuelas|habitchuelas|Baguio bean|green bean,Habitchuelas,
+hog,Hog,livestock,false,DA-PRICE-MONITORING,,,livestock is outside the crop scope
+ilang_ilang,Ilang-ilang,ornamental,false,PSA-QUEZON-CRPS-2022,,,ornamental or fragrance production is outside the current food-crop scope
+jackfruit,Jackfruit,fruit,true,PSA-QUEZON-CRPS-2022,langka,Langka,
+jackfruit_young,Young jackfruit,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,jackfruit young|young langka,Batang langka,
+jicama,Jicama,root_crop,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,singkamas|yam bean|turnip (singkamas),Singkamas,
+kamias,Bilimbi,fruit,true,PSA-QUEZON-CRPS-2022,kamias,Kamias,
+kangkong,Kangkong,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,water spinach|swamp cabbage,Kangkong,
+kaong,Kaong,plantation,false,PSA-QUEZON-CRPS-2022,,,palm crop and processed sap are outside the current food-crop scope
+kidney_bean,Kidney bean,legume,true,PSA-QUEZON-CRPS-2022,white kidney bean|white kidney beans,Butil ng kidney bean,
+lanzones,Lanzones,fruit,true,PSA-QUEZON-CRPS-2022,lanzon|lansones,Lanzones,
+laza_tambo,Laza or tambo,plant_product,false,PSA-QUEZON-CRPS-2022,,,non-food plant material is outside the current crop scope
+lemon,Lemon,fruit,true,PSA-BENGUET-CRPS-2025-Q1|Kew-Plants-of-the-World-Online,lemon fruit,Limon,
+lemongrass,Lemongrass,herb,true,DA-PRICE-MONITORING,lemon grass,Tanglad,
+lepote,Lepote,fruit,true,PSA-QUEZON-CRPS-2022,lepote fruit,Lepote,
+lettuce,Lettuce,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING,,Letsugas,
+lima_bean,Lima bean,legume,true,PSA-QUEZON-CRPS-2022,lima beans|patani,Patani,
+malunggay_leaves,Moringa leaves,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,malunggay leaves|drumstick leaves,Dahon ng malunggay,
+mandarin,Mandarin,fruit,true,PSA-QUEZON-CRPS-2022,mandarin orange|dalanghita,Dalanghita,
+mango,Mango,fruit,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,,Mangga,
+mangosteen,Mangosteen,fruit,true,PSA-QUEZON-CRPS-2022,mangosteen fruit,Mangostan,
+melon,Melon,fruit,true,DA-AMAS-PM-2026-02-25,melon fruit|cantaloupe,Melon,
+mung_bean,Mung bean,legume,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,green gram,Monggo,
+mustard_greens,Mustard greens,vegetable,true,PSA-QUEZON-CRPS-2022,mustard|mustasa,Mustasa,
+napier_grass,Napier grass,forage,false,PSA-QUEZON-CRPS-2022,,,forage crop is outside the current food-crop scope
+nipa_sap_wine,Nipa sap or wine,plantation,false,PSA-QUEZON-CRPS-2022,,,processed palm sap is outside the current food-crop scope
+okra,Okra,vegetable,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,lady's finger,Okra,
+onion,Onion,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,bulb onion,Sibuyas,
+orange,Orange,fruit,true,PSA-QUEZON-CRPS-2022,sweet orange|orange fruit,Kahel,
+orchids,Orchids,ornamental,false,PSA-QUEZON-CRPS-2022,,,ornamental production is outside the current food-crop scope
+oregano,Oregano,herb,true,PSA-QUEZON-CRPS-2022,wild marjoram,Oregano,
+paco,Edible fern,vegetable,true,PSA-QUEZON-CRPS-2022,paco|edible fern,Paco,
+pao_galiang,Pao (Galiang),root_crop,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,pao galiang|galiang,Galiang,
+papaya,Papaya,fruit,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,,Papaya,
+passion_fruit,Passion fruit,fruit,true,PSA-QUEZON-CRPS-2022,passion fruit,Passion fruit,
+patola,Ridge gourd,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,patola|angled luffa,Patola,
+peanut,Peanut,legume,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,groundnut,Mani,
+pechay,Pechay,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,pak choi|bok choy,Pechay,
+pigeon_pea,Pigeon pea,legume,true,PSA-QUEZON-CRPS-2022,kadios|pigeon peas,Kadios,
+pili_coir,Coir,fiber,false,PSA-QUEZON-CRPS-2022,,,processed fiber is not a crop-planning commodity
+pili_nut,Pili nut,fruit,true,PSA-QUEZON-CRPS-2022,pili|pili nuts,Pili,
+pineapple,Pineapple,fruit,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,,Pinya,
+pomelo,Pomelo,fruit,true,DA-AMAS-PM-2026-02-25|PSA-QUEZON-CRPS-2022,suha|pummelo,Suha,
+purple_yam,Purple yam,root_crop,true,DA-PRICE-MONITORING|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,greater yam|ubi,Ube,
+radish,Radish,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Labanos,
+rambutan,Rambutan,fruit,true,PSA-QUEZON-CRPS-2022,rambutan fruit,Rambutan,
+rice,Rice,grain,false,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08,,,staple grain is outside the current horticultural MVP scope
+sampaguita,Sampaguita,ornamental,false,PSA-QUEZON-CRPS-2022,,,ornamental or fragrance production is outside the current food-crop scope
+santol,Santol,fruit,true,PSA-QUEZON-CRPS-2022,santol fruit,Santol,
+shrimp,Shrimp,aquaculture,false,DA-PRICE-MONITORING,,,fisheries are outside the current crop scope
+sineguelas,Sineguelas,fruit,true,PSA-QUEZON-CRPS-2022,sinequelas|Spanish plum,Sineguelas,
+soursop,Soursop,fruit,true,PSA-QUEZON-CRPS-2022,guyabano|graviola,Guyabano,
+squash,Squash,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Kalabasa,
+squash_tops,Squash tops,vegetable,true,PSA-QUEZON-CRPS-2022,squash leaves|squash tops,Talbos ng kalabasa,
+star_apple,Star apple,fruit,true,PSA-QUEZON-CRPS-2022,caimito|star apple,Kaimito,
+strawberry,Strawberry,fruit,true,PSA-BENGUET-STRAWBERRY-2010-2025|PSA-BENGUET-CRPS-2025-Q1|Kew-Plants-of-the-World-Online,strawberries,Istraberi,
+string_bean,String bean,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,yardlong bean,Sitaw,
+sugarcane,Sugarcane,plantation,false,DA-PRICE-MONITORING|PSA-QUEZON-CRPS-2022,,,plantation commodity is outside the current horticultural MVP scope
+sweet_peas,Sweet peas,legume,true,PSA-BENGUET-HV-2025-H1|Kew-Plants-of-the-World-Online,snow peas|sugar peas,Sitsaro,
+sweet_potato,Sweet potato,root_crop,true,DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Kamote,
+tamarind,Tamarind,fruit,true,PSA-QUEZON-CRPS-2022,sampalok|tamarind fruit,Sampalok,
+taro,Taro,root_crop,true,DA-PRICE-MONITORING|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,,Gabi,
+taro_leaves,Taro leaves with stem,vegetable,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,gabi leaves with stem|taro leaves|gabi leaves,Dahon ng gabi,
+tilapia,Tilapia,aquaculture,false,DA-PRICE-MONITORING,,,fisheries are outside the current crop scope
+tobacco,Tobacco,industrial,false,DA-PRICE-MONITORING,,,industrial crop is outside the current food crop scope
+tomato,Tomato,vegetable,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,garden tomato,Kamatis,
+tugue,Tugue,root_crop,true,PSA-QUEZON-CRPS-2022|PSA-QUEZON-VRC-2025,tugui,Tugue,
+turmeric,Turmeric,spice,true,DA-PRICE-MONITORING,,Luyang dilaw,
+watermelon,Watermelon,fruit,true,DA-AMAS-PM-2026-02-25|DA-PRICE-MONITORING|PSA-OPENSTAT-2M4AFN08|PSA-QUEZON-CRPS-2022,,Pakwan,
+white_potato,White potato,root_crop,true,DA-AMAS-PM-2026-02-25,potato|Irish potato|patatas,Patatas,
+winged_bean,Winged bean,legume,true,PSA-QUEZON-CRPS-2022,winged beans|sigarilyas,Sigarilyas,

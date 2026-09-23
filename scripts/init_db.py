@@ -1,4 +1,4 @@
-"""Apply the baseline database migration once, without destructive operations."""
+"""Apply all numbered database migrations once, without destructive operations."""
 
 import os
 import sys
@@ -8,8 +8,7 @@ import psycopg
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
-MIGRATION = ROOT / "data" / "migrations" / "001_foundation.sql"
-MIGRATION_NAME = MIGRATION.name
+MIGRATION_DIR = ROOT / "data" / "migrations"
 
 
 def main() -> int:
@@ -21,14 +20,14 @@ def main() -> int:
         )
         return 1
 
-    if not MIGRATION.is_file():
-        print(f"Database initialization stopped: migration file is missing: {MIGRATION}")
+    migrations = sorted(MIGRATION_DIR.glob("[0-9][0-9][0-9]_*.sql"))
+    if not migrations:
+        print(f"Database initialization stopped: no migrations were found in {MIGRATION_DIR}")
         return 1
 
-    migration_sql = MIGRATION.read_text(encoding="utf-8")
     try:
         with psycopg.connect(database_url, connect_timeout=5) as connection:
-            connection.execute("SELECT pg_advisory_xact_lock(732041, 1)")
+            connection.execute("SELECT pg_advisory_lock(732041, 1)")
             connection.execute(
                 """
                 CREATE TABLE IF NOT EXISTS tanim_schema_migrations (
@@ -37,19 +36,25 @@ def main() -> int:
                 )
                 """
             )
-            already_applied = connection.execute(
-                "SELECT 1 FROM tanim_schema_migrations WHERE migration_name = %s",
-                (MIGRATION_NAME,),
-            ).fetchone()
-            if already_applied:
-                print(f"Database is ready. {MIGRATION_NAME} was already applied.")
-                return 0
-
-            connection.execute(migration_sql, prepare=False)
-            connection.execute(
-                "INSERT INTO tanim_schema_migrations (migration_name) VALUES (%s)",
-                (MIGRATION_NAME,),
-            )
+            applied = []
+            skipped = []
+            for migration in migrations:
+                migration_name = migration.name
+                already_applied = connection.execute(
+                    "SELECT 1 FROM tanim_schema_migrations WHERE migration_name = %s",
+                    (migration_name,),
+                ).fetchone()
+                if already_applied:
+                    skipped.append(migration_name)
+                    continue
+                migration_sql = migration.read_text(encoding="utf-8")
+                connection.execute(migration_sql, prepare=False)
+                connection.execute(
+                    "INSERT INTO tanim_schema_migrations (migration_name) VALUES (%s)",
+                    (migration_name,),
+                )
+                applied.append(migration_name)
+            connection.execute("SELECT pg_advisory_unlock(732041, 1)")
     except psycopg.OperationalError as error:
         print(
             "Database initialization failed: PostgreSQL is not reachable. "
@@ -59,8 +64,8 @@ def main() -> int:
     except psycopg.Error as error:
         code = error.sqlstate or "unknown"
         print(
-            f"Database initialization failed while applying {MIGRATION_NAME} "
-            f"(SQLSTATE {code}). Check the database permissions and migration."
+            "Database initialization failed while applying a migration "
+            f"(SQLSTATE {code}). Check the database permissions and migration files."
         )
         return 1
     except ValueError:
@@ -69,7 +74,10 @@ def main() -> int:
         )
         return 1
 
-    print(f"Database initialization complete. Applied {MIGRATION_NAME}.")
+    if applied:
+        print(f"Database initialization complete. Applied: {', '.join(applied)}.")
+    else:
+        print(f"Database is ready. Already applied: {', '.join(skipped)}.")
     return 0
 
 

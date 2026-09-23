@@ -1,0 +1,91 @@
+crop_id,canonical_name_en,canonical_name_tl,scientific_name,category,aliases_en,aliases_tl,active
+arrowroot,Arrowroot,Araro,Maranta arundinacea,root_crop,araro,,true
+atis,Sugar apple,Atis,Annona squamosa,fruit,atis|sweetsop,,true
+avocado,Avocado,Abokado,Persea americana,fruit,alligator pear,,true
+bamboo_shoots,Bamboo shoots,Labong,Bambusa spp.,vegetable,bamboo shoot|labong,,true
+banana,Banana,Saging,Musa acuminata,fruit,,,true
+banana_blossom,Banana blossom,Puso ng saging,Musa spp.,vegetable,banana flower|banana heart,,true
+basil,Basil,Balanoy,Ocimum basilicum,herb,sweet basil,,true
+bell_pepper,Bell pepper,Pamintang kampana,Capsicum annuum Group Grossum,vegetable,sweet pepper,,true
+bitter_gourd,Bitter gourd,Ampalaya,Momordica charantia,vegetable,bitter melon,,true
+bottle_gourd,Bottle gourd,Upo,Lagenaria siceraria,vegetable,gourd|upo,,true
+broccoli,Broccoli,Brokoli,Brassica oleracea var. italica,vegetable,,,true
+cabbage,Cabbage,Repolyo,Brassica oleracea var. capitata,vegetable,headed cabbage,,true
+calamansi,Calamansi,Kalamansi,Citrus × microcarpa,fruit,calamondin,,true
+camansi,Breadnut,Camansi,Artocarpus camansi,fruit,camansi fruit|seeded breadfruit,,true
+camote_tops,Sweet potato tops,Talbos ng kamote,Ipomoea batatas,vegetable,camote tops|kamote tops|sweet potato leaves,,true
+carrot,Carrot,Karot,Daucus carota subsp. sativus,vegetable,,,true
+cassava,Cassava,Kamoteng kahoy,Manihot esculenta,root_crop,manioc,,true
+cauliflower,Cauliflower,Koliplor,Brassica oleracea var. botrytis,vegetable,,,true
+celery,Celery,Kintsay,Apium graveolens,vegetable,kinchay|chinese celery|celery stalk,,true
+chayote,Chayote,Sayote,Sechium edule,vegetable,chayote fruit|sayote,,true
+chico,Sapodilla,Chico,Manilkara zapota,fruit,chico|sapodilla,,true
+chili_leaves,Chili leaves,Dahon ng sili,Capsicum frutescens,vegetable,chili pepper leaves|pepper chili leaves|sili leaves,,true
+chili_pepper,Chili pepper,Sili,Capsicum frutescens,vegetable,hot pepper,,true
+chinese_cabbage,Chinese cabbage,Repolyong Tsino,Brassica rapa,vegetable,napa cabbage|wombok,,true
+cowpea,Cowpea,Cowpea,Vigna unguiculata subsp. unguiculata,legume,black-eyed pea|cowpea,,true
+cucumber,Cucumber,Pipino,Cucumis sativus,vegetable,,,true
+dragon_fruit,Dragon fruit,Dragon fruit,Selenicereus undatus,fruit,pitaya|dragon fruit,,true
+duhat,Java plum,Duhat,Syzygium cumini,fruit,duhat|jamun,,true
+eggplant,Eggplant,Talong,Solanum melongena,vegetable,aubergine,,true
+garlic,Garlic,Bawang,Allium sativum,vegetable,,,true
+ginger,Ginger,Luya,Zingiber officinale,spice,,,true
+green_papaya,Green papaya,Papayang hilaw,Carica papaya,vegetable,unripe papaya|green papaya fruit,,true
+guava,Guava,Bayabas,Psidium guajava,fruit,,,true
+habichuelas,Baguio beans,Habitchuelas,Phaseolus vulgaris,vegetable,habichuelas|habitchuelas|Baguio bean|green bean,,true
+jackfruit,Jackfruit,Langka,Artocarpus heterophyllus,fruit,langka,,true
+jackfruit_young,Young jackfruit,Batang langka,Artocarpus heterophyllus,vegetable,jackfruit young|young langka,,true
+jicama,Jicama,Singkamas,Pachyrhizus erosus,root_crop,singkamas|yam bean|turnip (singkamas),,true
+kamias,Bilimbi,Kamias,Averrhoa bilimbi,fruit,kamias,,true
+kangkong,Kangkong,Kangkong,Ipomoea aquatica,vegetable,water spinach|swamp cabbage,,true
+kidney_bean,Kidney bean,Butil ng kidney bean,Phaseolus vulgaris,legume,white kidney bean|white kidney beans,,true
+lanzones,Lanzones,Lanzones,Lansium domesticum,fruit,lanzon|lansones,,true
+lemon,Lemon,Limon,Citrus × limon,fruit,lemon fruit,,true
+lemongrass,Lemongrass,Tanglad,Cymbopogon citratus,herb,lemon grass,,true
+lepote,Lepote,Lepote,,fruit,lepote fruit,,true
+lettuce,Lettuce,Letsugas,Lactuca sativa,vegetable,,,true
+lima_bean,Lima bean,Patani,Phaseolus lunatus,legume,lima beans|patani,,true
+malunggay_leaves,Moringa leaves,Dahon ng malunggay,Moringa oleifera,vegetable,malunggay leaves|drumstick leaves,,true
+mandarin,Mandarin,Dalanghita,Citrus reticulata,fruit,mandarin orange|dalanghita,,true
+mango,Mango,Mangga,Mangifera indica,fruit,,,true
+mangosteen,Mangosteen,Mangostan,Garcinia mangostana,fruit,mangosteen fruit,,true
+melon,Melon,Melon,Cucumis melo,fruit,melon fruit|cantaloupe,,true
+mung_bean,Mung bean,Monggo,Vigna radiata,legume,green gram,,true
+mustard_greens,Mustard greens,Mustasa,Brassica juncea,vegetable,mustard|mustasa,,true
+okra,Okra,Okra,Abelmoschus esculentus,vegetable,lady's finger,,true
+onion,Onion,Sibuyas,Allium cepa,vegetable,bulb onion,,true
+orange,Orange,Kahel,Citrus sinensis,fruit,sweet orange|orange fruit,,true
+oregano,Oregano,Oregano,Origanum vulgare,herb,wild marjoram,,true
+paco,Edible fern,Paco,Diplazium esculentum,vegetable,paco|edible fern,,true
+pao_galiang,Pao (Galiang),Galiang,,root_crop,pao galiang|galiang,,true
+papaya,Papaya,Papaya,Carica papaya,fruit,,,true
+passion_fruit,Passion fruit,Passion fruit,Passiflora edulis,fruit,passion fruit,,true
+patola,Ridge gourd,Patola,Luffa acutangula,vegetable,patola|angled luffa,,true
+peanut,Peanut,Mani,Arachis hypogaea,legume,groundnut,,true
+pechay,Pechay,Pechay,Brassica rapa subsp. chinensis,vegetable,pak choi|bok choy,,true
+pigeon_pea,Pigeon pea,Kadios,Cajanus cajan,legume,kadios|pigeon peas,,true
+pili_nut,Pili nut,Pili,Canarium ovatum,fruit,pili|pili nuts,,true
+pineapple,Pineapple,Pinya,Ananas comosus,fruit,,,true
+pomelo,Pomelo,Suha,Citrus maxima,fruit,suha|pummelo,,true
+purple_yam,Purple yam,Ube,Dioscorea alata,root_crop,greater yam|ubi,,true
+radish,Radish,Labanos,Raphanus sativus,vegetable,,,true
+rambutan,Rambutan,Rambutan,Nephelium lappaceum,fruit,rambutan fruit,,true
+santol,Santol,Santol,Sandoricum koetjape,fruit,santol fruit,,true
+sineguelas,Sineguelas,Sineguelas,Spondias purpurea,fruit,sinequelas|Spanish plum,,true
+soursop,Soursop,Guyabano,Annona muricata,fruit,guyabano|graviola,,true
+squash,Squash,Kalabasa,Cucurbita moschata,vegetable,,,true
+squash_tops,Squash tops,Talbos ng kalabasa,Cucurbita moschata,vegetable,squash leaves|squash tops,,true
+star_apple,Star apple,Kaimito,Chrysophyllum cainito,fruit,caimito|star apple,,true
+strawberry,Strawberry,Istraberi,Fragaria × ananassa,fruit,strawberries,,true
+string_bean,String bean,Sitaw,Vigna unguiculata subsp. sesquipedalis,vegetable,yardlong bean,,true
+sweet_peas,Sweet peas,Sitsaro,Lathyrus oleraceus,legume,snow peas|sugar peas,,true
+sweet_potato,Sweet potato,Kamote,Ipomoea batatas,root_crop,,,true
+tamarind,Tamarind,Sampalok,Tamarindus indica,fruit,sampalok|tamarind fruit,,true
+taro,Taro,Gabi,Colocasia esculenta,root_crop,,,true
+taro_leaves,Taro leaves with stem,Dahon ng gabi,Colocasia esculenta,vegetable,gabi leaves with stem|taro leaves|gabi leaves,,true
+tomato,Tomato,Kamatis,Solanum lycopersicum,vegetable,garden tomato,,true
+tugue,Tugue,Tugue,Dioscorea esculenta,root_crop,tugui,,true
+turmeric,Turmeric,Luyang dilaw,Curcuma longa,spice,,,true
+watermelon,Watermelon,Pakwan,Citrullus lanatus,fruit,,,true
+white_potato,White potato,Patatas,Solanum tuberosum,root_crop,potato|Irish potato|patatas,,true
+winged_bean,Winged bean,Sigarilyas,Psophocarpus tetragonolobus,legume,winged beans|sigarilyas,,true
