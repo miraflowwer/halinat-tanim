@@ -62,6 +62,9 @@ jobs:
       - name: Validate registries, data, provenance, and determinism
         run: npm run data:validate
 
+      - name: Apply PostgreSQL migrations and seed data
+        run: npm run data:seed
+
       - name: Run JavaScript and Python tests
         run: npm test
 
@@ -76,9 +79,6 @@ jobs:
 
       - name: Smoke test POST /risk/check
         run: npm run smoke:risk
-
-      - name: Apply PostgreSQL migrations and seed data
-        run: npm run data:seed
 
       - name: Verify repeat seeding and database fingerprints
         run: npm run data:seed

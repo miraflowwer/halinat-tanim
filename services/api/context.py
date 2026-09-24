@@ -7,6 +7,7 @@ import logging
 import math
 import os
 from calendar import monthrange
+from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import date
 from decimal import ROUND_HALF_UP, Decimal
@@ -126,9 +127,16 @@ class ContextRepository(Protocol):
 
 
 class PostgresContextRepository:
-    def __init__(self, database_url: str, configuration: ContextConfiguration) -> None:
+    def __init__(
+        self,
+        database_url: str,
+        configuration: ContextConfiguration,
+        *,
+        connection_factory: Callable[..., Any] | None = None,
+    ) -> None:
         self.database_url = database_url
         self.configuration = configuration
+        self.connection_factory = connection_factory or psycopg.connect
 
     @classmethod
     def from_environment(cls) -> PostgresContextRepository:
@@ -142,7 +150,7 @@ class PostgresContextRepository:
 
     def _run(self, operation):
         try:
-            with psycopg.connect(
+            with self.connection_factory(
                 self.database_url, connect_timeout=3, row_factory=dict_row
             ) as connection:
                 self._require_active_dataset(connection)
