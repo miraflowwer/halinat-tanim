@@ -2,23 +2,22 @@ import { useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { ApiClientError, apiRequest, setCsrfToken } from "@tanim/api-client";
 import { frontendUrls } from "@tanim/config";
-import { messages } from "@tanim/i18n";
+import { messages, phase5Messages } from "@tanim/i18n";
 import type { AuthUser, DemoResponse, Language, SessionResponse, RiskLevel } from "@tanim/types";
+import { PlatformPage } from "./PlatformPages";
+import { PlatformShell } from "./PlatformShell";
+import { navigate, resolveProtectedRoute } from "./navigation";
 
 const LANGUAGE_STORAGE_KEY = "tanim-language";
 const DEMO_STEP_COUNT = 7;
 
-function readLanguage(): Language {
-  return window.localStorage.getItem(LANGUAGE_STORAGE_KEY) === "tl" ? "tl" : "en";
+function readLanguage(): Language | null {
+  const saved = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
+  return saved === "tl" || saved === "en" ? saved : null;
 }
 
 function storeLanguage(language: Language) {
   window.localStorage.setItem(LANGUAGE_STORAGE_KEY, language);
-}
-
-function go(path: string) {
-  window.history.pushState({}, "", path);
-  window.dispatchEvent(new PopStateEvent("popstate"));
 }
 
 function formatArea(value: number) {
@@ -35,56 +34,6 @@ function formatPeriod(start: string, end: string, separator: string) {
 
 function localizedCropName(language: Language, english: string, tagalog: string | null) {
   return language === "tl" && tagalog ? tagalog : english;
-}
-
-function LanguageSelector({ language, onChange }: { language: Language; onChange: (value: Language) => void }) {
-  const copy = messages[language];
-  return (
-    <label className="language-control" htmlFor="language">
-      <span>{copy.languageLabel}</span>
-      <select
-        id="language"
-        value={language}
-        onChange={(event) => onChange(event.target.value as Language)}
-      >
-        <option value="en">{copy.languageOptions.en}</option>
-        <option value="tl">{copy.languageOptions.tl}</option>
-      </select>
-    </label>
-  );
-}
-
-function PlatformShell({
-  language,
-  onLanguageChange,
-  user,
-  onLogout,
-  children,
-}: {
-  language: Language;
-  onLanguageChange: (value: Language) => void;
-  user: AuthUser;
-  onLogout: () => void;
-  children: ReactNode;
-}) {
-  const copy = messages[language];
-  return (
-    <main className="app-shell platform-shell">
-      <header className="app-header">
-        <a className="brand-link" href="/home">
-          TANIM
-        </a>
-        <div className="header-actions">
-          <span className="user-badge">{user.display_name}</span>
-          <LanguageSelector language={language} onChange={onLanguageChange} />
-          <button className="quiet-button" type="button" onClick={onLogout}>
-            {copy.platform.logoutButton}
-          </button>
-        </div>
-      </header>
-      <div className="content-column">{children}</div>
-    </main>
-  );
 }
 
 function MetricList({
@@ -286,53 +235,20 @@ function DemoView({
   );
 }
 
-function HomeView({
-  language,
-  user,
-  onLanguageChange,
-  onLogout,
-}: {
-  language: Language;
-  user: AuthUser;
-  onLanguageChange: (value: Language) => void;
-  onLogout: () => void;
-}) {
-  const copy = messages[language];
-  return (
-    <PlatformShell
-      language={language}
-      onLanguageChange={onLanguageChange}
-      user={user}
-      onLogout={onLogout}
-    >
-      <section className="card stack" aria-labelledby="home-title">
-        <p className="eyebrow">{copy.platform.homeTitle}</p>
-        <h1 id="home-title">{copy.platform.homeTitle}</h1>
-        <p>{copy.platform.homeBody}</p>
-        <div className="button-row">
-          <button className="secondary-button" type="button" onClick={() => go("/demo?replay=1")}>
-            {copy.platform.replayButton}
-          </button>
-        </div>
-      </section>
-    </PlatformShell>
-  );
-}
-
 export function PlatformApp() {
-  const [language, setLanguage] = useState<Language>(readLanguage);
-  const [path, setPath] = useState(window.location.pathname || "/home");
+  const [language, setLanguage] = useState<Language>(readLanguage() ?? "en");
+  const [path, setPath] = useState(window.location.pathname || "/");
   const [session, setSession] = useState<SessionResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const copy = useMemo(() => messages[language], [language]);
+  const platformCopy = useMemo(() => phase5Messages[language], [language]);
   const replay = new URLSearchParams(window.location.search).get("replay") === "1";
 
   useEffect(() => {
-    const onPopState = () => setPath(window.location.pathname || "/home");
+    const onPopState = () => setPath(window.location.pathname || "/");
     window.addEventListener("popstate", onPopState);
     document.documentElement.lang = language === "tl" ? "tl" : "en";
-    storeLanguage(language);
     return () => window.removeEventListener("popstate", onPopState);
   }, [language]);
 
@@ -340,6 +256,12 @@ export function PlatformApp() {
     let active = true;
     setLoading(true);
     setError(null);
+    if (path === "/" || path === "/home") {
+      navigate("/dashboard");
+      return () => {
+        active = false;
+      };
+    }
     void apiRequest<SessionResponse>("/auth/session")
       .then((result) => {
         if (!active) return;
@@ -348,12 +270,18 @@ export function PlatformApp() {
           window.location.href = `${frontendUrls.auth}/login`;
           return;
         }
-        if (path === "/home" && !result.user.has_completed_demo) {
-          go("/demo");
+        const decision = resolveProtectedRoute(path, result, replay);
+        if (decision.kind === "auth") {
+          window.location.href = `${frontendUrls.auth}/login`;
           return;
         }
-        if (path === "/demo" && result.user.has_completed_demo && !replay) {
-          go("/home");
+        if (decision.kind === "redirect") {
+          navigate(decision.path);
+          return;
+        }
+        if (!readLanguage()) {
+          setLanguage(result.user.preferred_language);
+          storeLanguage(result.user.preferred_language);
         }
       })
       .catch((caught) => {
@@ -375,7 +303,7 @@ export function PlatformApp() {
         ? { ...current, user: { ...current.user, has_completed_demo: true } }
         : current,
     );
-    go("/home");
+    navigate("/dashboard");
   }
 
   async function logout() {
@@ -387,9 +315,12 @@ export function PlatformApp() {
     }
   }
 
-  const onLanguageChange = (value: Language) => setLanguage(value);
+  const onLanguageChange = (value: Language) => {
+    setLanguage(value);
+    storeLanguage(value);
+  };
   if (loading) {
-    return <main className="app-shell"><p aria-live="polite">{copy.platform.loading}</p></main>;
+    return <main className="app-shell"><p aria-live="polite">{platformCopy.loading}</p></main>;
   }
   if (error) {
     return <main className="app-shell"><p className="form-error" role="alert">{error}</p></main>;
@@ -407,11 +338,12 @@ export function PlatformApp() {
     );
   }
   return (
-    <HomeView
+    <PlatformPage
       language={language}
       user={session.user}
       onLanguageChange={onLanguageChange}
       onLogout={() => void logout()}
+      path={path}
     />
   );
 }

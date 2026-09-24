@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { PlatformApp } from "./App";
 import "@tanim/ui/style.css";
+import "./platform.css";
 
 const root = document.getElementById("root");
 

@@ -52,3 +52,29 @@ def build_unavailable_explanation(
         "is available for this planning period. TANIM cannot calculate a supply "
         "pressure ratio or risk level."
     )
+
+
+def build_available_context_explanation(
+    *,
+    crop_name: str,
+    planned_area_ha: Decimal,
+    reference_area_ha: Decimal,
+    ratio: Decimal,
+    risk: RiskLevel,
+) -> str:
+    return (
+        f"Registered {crop_name} plans for this planning period total "
+        f"{_area_text(planned_area_ha)} ha against a "
+        f"{_area_text(reference_area_ha)} ha reference. The supply pressure ratio is "
+        f"{_ratio_text(ratio)}, which is {risk.capitalize()} under the current TANIM "
+        "prototype thresholds."
+    )
+
+
+def build_unavailable_context_explanation(*, crop_name: str, planned_area_ha: Decimal) -> str:
+    return (
+        f"Registered {crop_name} plans for this planning period total "
+        f"{_area_text(planned_area_ha)} ha, but no usable reference area is available "
+        "for this planning period. TANIM cannot calculate a supply pressure ratio "
+        "or risk level."
+    )

@@ -97,3 +97,22 @@ class RiskCheckResult:
     dataset_version: str
     explanation: str
     comparisons: tuple[ComparisonResult, ...]
+
+
+@dataclass(frozen=True)
+class RiskContextResult:
+    """Current community pressure for one crop, place, and planning period."""
+
+    status: RiskStatus
+    crop_id: str
+    geography_id: str
+    planning_period_start: date
+    planning_period_end: date
+    planned_area_ha: Decimal
+    reference_area_ha: Decimal | None
+    ratio: Decimal | None
+    risk: RiskLevel | None
+    contributing_plan_count: int
+    assumption_version: str
+    dataset_version: str
+    explanation: str
