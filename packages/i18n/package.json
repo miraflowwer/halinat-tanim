@@ -4,7 +4,8 @@
   "private": true,
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./phase6": "./src/phase6.ts"
   },
   "dependencies": {
     "@tanim/types": "*"

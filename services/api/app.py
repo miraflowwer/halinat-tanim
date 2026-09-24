@@ -26,6 +26,7 @@ from services.api.config import (
     allowed_origins,
     session_cookie_secure,
 )
+from services.api.context import router as context_router
 from services.api.demo import (
     DemoNotReadyError,
     DemoScenarioRecord,
@@ -56,6 +57,7 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PATCH", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "X-CSRF-Token"],
 )
+app.include_router(context_router)
 
 
 def _decimal_as_json_number(value: Decimal | None) -> float | str | None:
