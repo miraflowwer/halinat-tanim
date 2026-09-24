@@ -76,6 +76,7 @@ export function PlatformShell({
   const roleLabel = user.role === "cooperative" ? copy.roleCooperative : copy.roleFarmer;
   return (
     <div className="platform-app-shell">
+      <a className="skip-link" href="#platform-main">{copy.navLabel}</a>
       <header className="platform-header">
         <a className="brand-link" href="/dashboard" onClick={(event) => {
           event.preventDefault();
@@ -97,12 +98,14 @@ export function PlatformShell({
         <InternalLink href="/dashboard">{copy.navDashboard}</InternalLink>
         <InternalLink href="/plans">{copy.navPlans}</InternalLink>
         <InternalLink href="/crops">{copy.navCrops}</InternalLink>
+        <InternalLink href="/prices">{copy.navPrices}</InternalLink>
+        <InternalLink href="/suitability">{copy.navSuitability}</InternalLink>
         <InternalLink href="/map">{copy.navMap}</InternalLink>
         <InternalLink href="/weather">{copy.navWeather}</InternalLink>
         <a href={frontendUrls.docs} target="_blank" rel="noreferrer">{copy.navHelp}</a>
       </nav>
 
-      <main className="platform-main">{children}</main>
+      <main id="platform-main" className="platform-main" tabIndex={-1}>{children}</main>
 
       <nav className="mobile-nav" aria-label={copy.navLabel}>
         <InternalLink href="/dashboard">{copy.navDashboard}</InternalLink>
@@ -123,6 +126,8 @@ export function PlatformShell({
           <InternalLink href="/settings">{copy.navSettings}</InternalLink>
           <a href={frontendUrls.docs} target="_blank" rel="noreferrer">{copy.navHelp}</a>
           <InternalLink href="/crops">{copy.navCrops}</InternalLink>
+          <InternalLink href="/prices">{copy.navPrices}</InternalLink>
+          <InternalLink href="/suitability">{copy.navSuitability}</InternalLink>
           <InternalLink href="/map">{copy.navMap}</InternalLink>
           <InternalLink href="/weather">{copy.navWeather}</InternalLink>
         </div>

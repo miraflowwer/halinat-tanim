@@ -54,6 +54,7 @@ type Messages = {
     finishBody: string;
     nextButton: string;
     backButton: string;
+    skipButton: string;
     startButton: string;
     homeTitle: string;
     homeBody: string;
@@ -161,6 +162,7 @@ export const messages: Record<Language, Messages> = {
       finishBody: "Your real TANIM data will start empty. The demo did not create a planting plan.",
       nextButton: "Next",
       backButton: "Back",
+      skipButton: "Skip demo",
       startButton: "Start using TANIM",
       homeTitle: "TANIM home",
       homeBody: "This authenticated home is ready for the next platform phase. Your first-time demo is complete.",
@@ -293,6 +295,7 @@ export const messages: Record<Language, Messages> = {
       finishBody: "Magsisimula na walang laman ang iyong totoong TANIM data. Walang planting plan na ginawa ang demo.",
       nextButton: "Susunod",
       backButton: "Bumalik",
+      skipButton: "Laktawan ang demo",
       startButton: "Simulan ang TANIM",
       homeTitle: "Home ng TANIM",
       homeBody: "Handa ang authenticated home para sa susunod na phase ng platform. Tapos na ang iyong unang demo.",
