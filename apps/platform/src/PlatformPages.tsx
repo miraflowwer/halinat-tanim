@@ -766,6 +766,10 @@ function RiskPreview({
   );
 }
 
+function asLookupList<T>(payload: T[] | { items: T[] }): T[] {
+  return Array.isArray(payload) ? payload : payload.items;
+}
+
 function PlanFormPage({ planId, ...props }: PageProps & { planId?: number }) {
   const { language } = props;
   const copy = phase5Messages[language];
@@ -789,12 +793,12 @@ function PlanFormPage({ planId, ...props }: PageProps & { planId?: number }) {
     setLoadError(null);
     try {
       const [cropResponse, geographyResponse, periodItems] = await Promise.all([
-        apiRequest<CropListResponse>("/crops"),
-        apiRequest<{ items: GeographyLookup[] }>("/geographies"),
+        apiRequest<CropListResponse | CropLookup[]>("/crops"),
+        apiRequest<GeographyLookup[] | { items: GeographyLookup[] }>("/geographies"),
         apiRequest<PlanningPeriod[]>("/planning-periods"),
       ]);
-      const cropItems = cropResponse.items;
-      const geographyItems = geographyResponse.items;
+      const cropItems = asLookupList<CropLookup>(cropResponse);
+      const geographyItems = asLookupList<GeographyLookup>(geographyResponse);
       setCrops(cropItems);
       setGeographies(geographyItems);
       setPeriods(periodItems);

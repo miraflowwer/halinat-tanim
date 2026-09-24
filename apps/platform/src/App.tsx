@@ -4,6 +4,7 @@ import { ApiClientError, apiRequest, setCsrfToken } from "@tanim/api-client";
 import { frontendUrls } from "@tanim/config";
 import { messages, phase5Messages } from "@tanim/i18n";
 import type { AuthUser, DemoResponse, Language, SessionResponse, RiskLevel } from "@tanim/types";
+import { Phase6UtilityRoutes } from "./features/phase6/routes";
 import { PlatformPage } from "./PlatformPages";
 import { PlatformShell } from "./PlatformShell";
 import { navigate, resolveProtectedRoute } from "./navigation";
@@ -194,7 +195,6 @@ function DemoView({
       <section className="card stack" aria-labelledby="demo-title">
         <div className="split-heading">
           <div>
-            <p className="eyebrow">{copy.platform.demoTitle}</p>
             <h1 id="demo-title">
               {primary
                 ? localizedCropName(language, primary.crop_name_en, primary.crop_name_tl)
@@ -347,6 +347,26 @@ export function PlatformApp() {
         onLogout={() => void logout()}
         onComplete={completeDemo}
       />
+    );
+  }
+  if (
+    path === "/crops"
+    || /^\/crops\/[^/]+$/.test(path)
+    || path === "/prices"
+    || path === "/suitability"
+    || path === "/map"
+    || path === "/supply-map"
+    || path === "/weather"
+  ) {
+    return (
+      <PlatformShell
+        language={language}
+        onLanguageChange={onLanguageChange}
+        user={session.user}
+        onLogout={() => void logout()}
+      >
+        <Phase6UtilityRoutes path={path} language={language} />
+      </PlatformShell>
     );
   }
   return (

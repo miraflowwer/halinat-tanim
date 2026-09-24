@@ -73,8 +73,10 @@ function AuthShell({
         </a>
         <LanguageSelector language={language} onChange={onLanguageChange} />
       </header>
-      <div className="content-column">{children}</div>
-      <footer className="muted-text">{copy.description}</footer>
+      <div className="content-column stack">
+        {children}
+        <footer className="muted-text">{copy.description}</footer>
+      </div>
     </main>
   );
 }
@@ -116,7 +118,6 @@ function PrivacyPage({
   return (
     <AuthShell language={language} onLanguageChange={onLanguageChange}>
       <section className="card stack" aria-labelledby="privacy-title">
-        <p className="eyebrow">TANIM</p>
         <h1 id="privacy-title">{copy.auth.privacyTitle}</h1>
         <p>{copy.auth.privacyIntro}</p>
         <ul className="plain-list">
@@ -129,7 +130,7 @@ function PrivacyPage({
           <p className="muted-text">{privacyNoticeVersion}</p>
         </details>
         <form className="stack" onSubmit={continueToRegister}>
-          <label className="checkbox-row">
+          <label className="checkbox-row signature-consent">
             <input
               type="checkbox"
               checked={required}
