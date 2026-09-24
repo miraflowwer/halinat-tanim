@@ -85,6 +85,20 @@ type Messages = {
   };
   riskLabels: Record<"low" | "moderate" | "high", string>;
   errors: Record<string, string>;
+  landing: {
+    tagline: string;
+    intro: string;
+    ledgerWhat: string;
+    ledgerWhere: string;
+    ledgerDemo: string;
+    docsLink: string;
+  };
+  docs: {
+    intro: string;
+    sections: { heading: string; body: string }[];
+    workspaceLink: string;
+    authLink: string;
+  };
 };
 
 export const messages: Record<Language, Messages> = {
@@ -170,6 +184,42 @@ export const messages: Record<Language, Messages> = {
         `Registered ${crop} plans total ${existing} ha. Adding ${proposed} ha gives ${projected} ha against a ${reference} ha reference. The supply pressure ratio is ${ratio}, which is ${risk}.`,
     },
     riskLabels: { low: "Low", moderate: "Moderate", high: "High" },
+    landing: {
+      tagline: "Know before you plant.",
+      intro:
+        "TANIM compares your planned crop supply with a reference level before planting decisions are finalized.",
+      ledgerWhat: "Answers Low, Moderate, or High glut risk, and shows the inputs used.",
+      ledgerWhere: "Luzon only: Region, Province, and Municipality or City.",
+      ledgerDemo: "New accounts start with an interactive demo. Demo data is labeled.",
+      docsLink: "Read the help pages",
+    },
+    docs: {
+      intro: "Short guides for farmers and cooperatives using TANIM in Luzon.",
+      sections: [
+        {
+          heading: "What TANIM checks",
+          body: "Before planting, TANIM compares the planned supply of one crop for one harvest period with a reference level. It answers Low, Moderate, or High, and shows the inputs it used.",
+        },
+        {
+          heading: "Where TANIM works",
+          body: "TANIM covers Luzon only, down to Municipality or City. Barangay-level support is not included.",
+        },
+        {
+          heading: "Demo and sample data",
+          body: "New accounts take a first-time interactive demo. Sample and generated values are labeled as demo-only and are never presented as government-published figures.",
+        },
+        {
+          heading: "Weather needs internet",
+          body: "Weather is the only feature that needs a live connection. If TANIM cannot reach the weather service, it says so and lets you retry. It never fails silently.",
+        },
+        {
+          heading: "Where to start",
+          body: "Create an account, take the demo, then open the workspace to plan.",
+        },
+      ],
+      workspaceLink: "Open the workspace",
+      authLink: "Create an account or log in",
+    },
     errors: {
       INVALID_EMAIL: "Enter a valid email address.",
       INVALID_PASSWORD: "Use at least 8 characters for your password.",
@@ -267,6 +317,42 @@ export const messages: Record<Language, Messages> = {
         `Ang nakaplanong ${crop} ay ${existing} ha. Kapag idinagdag ang ${proposed} ha, magiging ${projected} ha ito laban sa ${reference} ha na reference. Ang supply pressure ratio ay ${ratio}, na ${risk}.`,
     },
     riskLabels: { low: "Mababa", moderate: "Katamtaman", high: "Mataas" },
+    landing: {
+      tagline: "Alamin bago magtanim.",
+      intro:
+        "Ipinaghahambing ng TANIM ang iyong planong supply ng pananim sa reference level bago matapos ang desisyon sa pagtatanim.",
+      ledgerWhat: "Sumasagot ng Mababa, Katamtaman, o Mataas na glut risk, at ipinapakita ang datos na ginamit.",
+      ledgerWhere: "Luzon lamang: Region, Province, at Municipality o City.",
+      ledgerDemo: "Nagsisimula ang bagong account sa interactive demo. May label ang demo data.",
+      docsLink: "Basahin ang mga pahina ng tulong",
+    },
+    docs: {
+      intro: "Maikling gabay para sa mga magsasaka at kooperatiba na gumagamit ng TANIM sa Luzon.",
+      sections: [
+        {
+          heading: "Ano ang sinusuri ng TANIM",
+          body: "Bago magtanim, ipinaghahambing ng TANIM ang planong supply ng isang pananim para sa isang panahon ng ani sa reference level. Sumasagot ito ng Mababa, Katamtaman, o Mataas, at ipinapakita ang datos na ginamit.",
+        },
+        {
+          heading: "Saan gumagana ang TANIM",
+          body: "Sakop ng TANIM ang Luzon lamang, hanggang Municipality o City. Hindi kasama ang antas ng Barangay.",
+        },
+        {
+          heading: "Demo at sample data",
+          body: "Sumasailalim ang bagong account sa unang interactive demo. May label ang sample at generated values bilang demo-only at hindi ito ipinapakitang datos ng pamahalaan.",
+        },
+        {
+          heading: "Kailangan ng internet ang weather",
+          body: "Ang weather lang ang feature na kailangan ng live connection. Kung hindi maabot ng TANIM ang weather service, sasabihin nito at maaari mong subukan muli. Hindi ito tahimik na pumapalya.",
+        },
+        {
+          heading: "Saan magsisimula",
+          body: "Gumawa ng account, gawin ang demo, pagkatapos ay buksan ang workspace para magplano.",
+        },
+      ],
+      workspaceLink: "Buksan ang workspace",
+      authLink: "Gumawa ng account o mag-login",
+    },
     errors: {
       INVALID_EMAIL: "Maglagay ng wastong email address.",
       INVALID_PASSWORD: "Gumamit ng hindi bababa sa 8 character para sa password.",

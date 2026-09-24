@@ -293,6 +293,47 @@ summary {
   }
 }
 
+/* Cover page: the logbook cover. Masthead, ruled facts, signing actions. */
+.cover-column {
+  padding-block: clamp(1rem, 6vw, 3rem);
+}
+
+.cover-title {
+  font-size: clamp(2.5rem, 9vw, 4.5rem);
+  letter-spacing: -0.03em;
+}
+
+.cover-intro {
+  font-size: 1.125rem;
+}
+
+.ledger-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ledger-list li {
+  border-bottom: 1px solid var(--tanim-line);
+  padding: 0.65rem 0;
+}
+
+.ledger-list li:first-child {
+  border-top: 1px solid var(--tanim-line);
+}
+
+/* Signing: the consent line is the signature. */
+.signature-consent > span {
+  border-bottom: 2px solid var(--tanim-ink);
+  padding-bottom: 0.15rem;
+}
+
+/* Leaflet: one card, ruled sections. */
+.leaflet-section + .leaflet-section {
+  border-top: 1px solid var(--tanim-line);
+  padding-top: 1rem;
+}
+
 @media (max-width: 42rem) {
   .app-header,
   .split-heading {

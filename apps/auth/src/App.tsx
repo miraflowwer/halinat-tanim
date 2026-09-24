@@ -128,7 +128,7 @@ function PrivacyPage({
           <p className="muted-text">{privacyNoticeVersion}</p>
         </details>
         <form className="stack" onSubmit={continueToRegister}>
-          <label className="checkbox-row">
+          <label className="checkbox-row signature-consent">
             <input
               type="checkbox"
               checked={required}

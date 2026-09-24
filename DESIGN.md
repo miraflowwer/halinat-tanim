@@ -38,6 +38,17 @@ typography:
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: "-0.02em"
+  cover:
+    fontFamily: "system-ui, sans-serif"
+    fontSize: "clamp(2.5rem, 9vw, 4.5rem)"
+    fontWeight: 700
+    lineHeight: 1.15
+    letterSpacing: "-0.03em"
+  lede:
+    fontFamily: "system-ui, sans-serif"
+    fontSize: "1.125rem"
+    fontWeight: 400
+    lineHeight: 1.5
   body:
     fontFamily: "system-ui, sans-serif"
     fontSize: "1rem"
@@ -48,6 +59,12 @@ typography:
     fontSize: "0.875rem"
     fontWeight: 400
     lineHeight: 1.5
+  brand:
+    fontFamily: "system-ui, sans-serif"
+    fontSize: "1.25rem"
+    fontWeight: 700
+    lineHeight: 1.5
+    letterSpacing: "0.04em"
 rounded:
   sm: "6px"
   md: "12px"

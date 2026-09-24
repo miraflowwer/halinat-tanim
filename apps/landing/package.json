@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@tanim/config": "*",
+    "@tanim/i18n": "*",
     "@tanim/ui": "*",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
