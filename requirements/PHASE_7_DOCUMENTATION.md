@@ -2,7 +2,7 @@
 
 ## Scope
 
-Replace the documentation placeholder with a local, responsive, bilingual TANIM documentation site at `http://127.0.0.1:3003`. It serves farmers, cooperative users, judges, and future developers. It describes only behavior supported by the checked-out repository and keeps hidden reconciliation records for Phase 4 to Phase 6 until the full documentation check is complete.
+Replace the documentation placeholder with a local, responsive, bilingual TANIM documentation site at `http://127.0.0.1:3003`. It serves farmers, cooperative users, judges, and future developers. It describes behavior supported by the integrated Phase 1 to Phase 6 implementation and the Phase 8 audit fixes.
 
 ## Information architecture
 
@@ -28,8 +28,8 @@ Documentation covers privacy status, practical ethics, prototype terms, copyrigh
 
 ## Parallel-work reconciliation
 
-Phase 4 to Phase 6 behavior may change as those product areas are completed. Document verified behavior and avoid naming unverified controls. Track remaining checks in `apps/docs/src/content/reconciliation.ts`. After all three phases are merged, compare the implementations with every affected route and remove all `TODO-PHASE-RECONCILE` markers.
+Phase 4 to Phase 6 behavior was checked against the integrated implementation during the Phase 8 audit. The documentation covers the verified registration, consent, demo, planting-plan, cooperative overview, crop, price, suitability, map, and weather flows. `apps/docs/src/content/reconciliation.ts` is empty because no phase reconciliation records remain.
 
 ## Non-goals
 
-This phase does not redesign the other TANIM applications, change engine or product behavior, add a documentation framework or external search service, perform final visual design, create `DESIGN.md`, merge the pull request, or complete final Phase 4 to Phase 6 reconciliation before those phases are merged.
+This phase does not redesign the other TANIM applications, change engine or product behavior, add a documentation framework or external search service, or add cloud deployment.
