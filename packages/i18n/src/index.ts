@@ -109,7 +109,7 @@ export const messages: Record<Language, Messages> = {
       platform: "TANIM workspace",
       docs: "TANIM help and documentation",
     },
-    description: "TANIM helps farmers plan crops with their community. This is a starter page.",
+    description: "TANIM helps farmers plan crops with their community.",
     languageLabel: "Language / Wika",
     languageOptions: { en: "English", tl: "Tagalog" },
     auth: {
@@ -241,8 +241,7 @@ export const messages: Record<Language, Messages> = {
       platform: "Lugar ng trabaho sa TANIM",
       docs: "Tulong at gabay sa TANIM",
     },
-    description:
-      "Tinutulungan ng TANIM ang mga magsasaka na magplano ng pananim kasama ang komunidad. Panimulang pahina ito.",
+    description: "Tinutulungan ng TANIM ang mga magsasaka na magplano ng pananim kasama ang komunidad.",
     languageLabel: "Wika / Language",
     languageOptions: { en: "English", tl: "Tagalog" },
     auth: {

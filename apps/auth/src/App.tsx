@@ -73,8 +73,10 @@ function AuthShell({
         </a>
         <LanguageSelector language={language} onChange={onLanguageChange} />
       </header>
-      <div className="content-column">{children}</div>
-      <footer className="muted-text">{copy.description}</footer>
+      <div className="content-column stack">
+        {children}
+        <footer className="muted-text">{copy.description}</footer>
+      </div>
     </main>
   );
 }

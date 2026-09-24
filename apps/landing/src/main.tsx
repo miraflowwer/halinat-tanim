@@ -69,8 +69,8 @@ function LandingPage() {
         <p className="link-row">
           <a href={`${frontendUrls.docs}/`}>{copy.landing.docsLink}</a>
         </p>
+        <footer className="muted-text">{copy.description}</footer>
       </div>
-      <footer className="muted-text">{copy.description}</footer>
     </main>
   );
 }
