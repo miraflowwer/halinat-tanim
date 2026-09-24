@@ -1,6 +1,6 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { PlaceholderPage } from "@tanim/ui";
+import { PlatformApp } from "./App";
 import "@tanim/ui/style.css";
 
 const root = document.getElementById("root");
@@ -11,6 +11,6 @@ if (!root) {
 
 createRoot(root).render(
   <StrictMode>
-    <PlaceholderPage surface="platform" />
+    <PlatformApp />
   </StrictMode>,
 );

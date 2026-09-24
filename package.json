@@ -10,6 +10,8 @@
     "data:generate": "node scripts/run-python.mjs scripts/generate_demo_data.py",
     "data:validate": "node scripts/run-python.mjs scripts/validate_data.py",
     "data:seed": "node scripts/run-python.mjs scripts/seed_data.py",
+    "auth:seed-demo": "node scripts/run-python.mjs scripts/seed_demo_accounts.py",
+    "auth:cleanup-sessions": "node scripts/run-python.mjs scripts/cleanup_sessions.py",
     "dev:landing": "npm --workspace @tanim/landing run dev -- --host 127.0.0.1 --port 3000",
     "dev:auth": "npm --workspace @tanim/auth run dev -- --host 127.0.0.1 --port 3001",
     "dev:platform": "npm --workspace @tanim/platform run dev -- --host 127.0.0.1 --port 3002",
@@ -21,6 +23,7 @@
     "test": "npm run test:js && npm run test:py",
     "smoke:api": "node scripts/run-python.mjs scripts/smoke_api.py",
     "smoke:risk": "node scripts/run-python.mjs scripts/smoke_risk_api.py",
+    "smoke:auth": "node scripts/run-python.mjs scripts/smoke_auth.py",
     "lint:js": "npm run lint --workspaces --if-present",
     "lint:py": "node scripts/run-python.mjs -m ruff check services tests scripts",
     "lint": "npm run lint:js && npm run lint:py"
