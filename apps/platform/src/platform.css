@@ -1,3 +1,19 @@
+.skip-link {
+  position: absolute;
+  z-index: 30;
+  top: 0.5rem;
+  left: 0.5rem;
+  transform: translateY(-200%);
+  border-radius: 0.35rem;
+  background: #fff;
+  padding: 0.65rem 0.9rem;
+  color: #185c39;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
 .platform-app-shell {
   width: min(100%, 92rem);
   min-height: 100vh;
@@ -400,12 +416,12 @@
     border-radius: 0.35rem;
     background: transparent;
     color: #185c39;
-    font-size: 0.64rem;
+    font-size: 0.75rem;
     font-weight: 650;
-    line-height: 1.1;
+    line-height: 1.2;
     text-align: center;
     text-decoration: none;
-    overflow-wrap: normal;
+    overflow-wrap: anywhere;
   }
 
   .mobile-nav a:first-child {
@@ -443,6 +459,12 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .status-label {
+    animation: none;
+  }
+}
+
 @media (max-width: 22rem) {
   .platform-header-actions .language-control {
     width: 100%;
@@ -450,7 +472,7 @@
 
   .mobile-nav a,
   .mobile-nav button {
-    font-size: 0.6rem;
+    font-size: 0.7rem;
   }
 
   .responsive-table td {

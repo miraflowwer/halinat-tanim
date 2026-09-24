@@ -165,8 +165,8 @@ function DemoView({
           items={[
             { label: copy.platform.existingLabel, value: `${formatArea(comparison.existing_planned_area_ha)} ${copy.platform.areaUnit}` },
             { label: copy.platform.referenceLabel, value: `${formatArea(comparison.reference_area_ha)} ${copy.platform.areaUnit}` },
-            { label: copy.platform.currentPressureLabel, value: `${formatRatio(comparison.current_ratio, 6)} · ${riskLabel(copy, comparison.current_risk)}` },
-            { label: copy.platform.hypotheticalPressureLabel, value: `${formatRatio(comparison.projected_ratio_if_same_area, 6)} · ${riskLabel(copy, comparison.projected_risk_if_same_area)}` },
+            { label: copy.platform.currentPressureLabel, value: `${formatRatio(comparison.current_ratio, 2)} · ${riskLabel(copy, comparison.current_risk)}` },
+            { label: copy.platform.hypotheticalPressureLabel, value: `${formatRatio(comparison.projected_ratio_if_same_area, 2)} · ${riskLabel(copy, comparison.projected_risk_if_same_area)}` },
           ]}
         />
       </section>,
@@ -195,16 +195,13 @@ function DemoView({
       <section className="card stack" aria-labelledby="demo-title">
         <div className="split-heading">
           <div>
-            <h1 id="demo-title">
-              {primary
-                ? localizedCropName(language, primary.crop_name_en, primary.crop_name_tl)
-                : copy.platform.demoTitle}
-            </h1>
+            <h1 id="demo-title">{copy.platform.demoTitle}</h1>
           </div>
           <p className="step-count" aria-live="polite">
             {copy.platform.stepLabel} {step + 1} / {DEMO_STEP_COUNT}
           </p>
         </div>
+        <progress value={step + 1} max={DEMO_STEP_COUNT} aria-label={`${copy.platform.stepLabel} ${step + 1} / ${DEMO_STEP_COUNT}`} />
         {loading ? <p aria-live="polite">{copy.platform.loading}</p> : null}
         {error ? (
           <div className="stack" role="alert">
@@ -227,6 +224,9 @@ function DemoView({
             </button>
             <button className="primary-button" type="button" onClick={() => setStep((current) => current + 1)}>
               {copy.platform.nextButton}
+            </button>
+            <button className="quiet-button" disabled={completing} type="button" onClick={() => void finish()}>
+              {copy.platform.skipButton}
             </button>
           </div>
         ) : null}

@@ -274,6 +274,12 @@
   animation: logbook-stamp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .phase6-suitability {
+    animation: none;
+  }
+}
+
 .phase6-level-suitable,
 .phase6-level-low {
   --phase6-fill: #dcefe1;

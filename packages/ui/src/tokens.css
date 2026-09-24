@@ -1,0 +1,12 @@
+:root {
+  --tanim-font: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --tanim-green-900: #173f2a;
+  --tanim-green-700: #185c39;
+  --tanim-border: #d4e0d6;
+  --tanim-border-strong: #b9cbbd;
+  --tanim-paper: #fffef9;
+  --tanim-wash: #f7faf7;
+  --tanim-focus: #185c39;
+}
+
+/* ponytail: single token file, per-app css imports it instead of duplicating values */

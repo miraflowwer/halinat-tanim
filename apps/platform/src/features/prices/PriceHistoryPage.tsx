@@ -65,19 +65,28 @@ function PriceChart({
           />
           {points.length > 1 ? <polyline points={line} className="phase6-chart-line" /> : null}
           {points.map((point, index) => (
-            <circle
-              key={`${point.record.date}-${point.record.geography_id}`}
-              cx={point.x}
-              cy={point.y}
-              r={index === selectedIndex ? 7 : 5}
-              className="phase6-chart-point"
-              role="img"
-              tabIndex={0}
-              aria-label={`${point.record.date}: ${formatPrice(point.record.price_php_per_kg)}; ${point.record.geography_name}`}
-              onFocus={() => setSelectedIndex(index)}
-              onMouseEnter={() => setSelectedIndex(index)}
-            />
+            <g key={`${point.record.date}-${point.record.geography_id}`}>
+              <circle cx={point.x} cy={point.y} r={14} fill="transparent" />
+              <circle
+                cx={point.x}
+                cy={point.y}
+                r={index === selectedIndex ? 9 : 8}
+                className="phase6-chart-point"
+                role="button"
+                tabIndex={0}
+                aria-label={`${point.record.date}: ${formatPrice(point.record.price_php_per_kg)}; ${point.record.geography_name}`}
+                onFocus={() => setSelectedIndex(index)}
+                onMouseEnter={() => setSelectedIndex(index)}
+                onClick={() => setSelectedIndex(index)}
+                onKeyDown={(event) => {
+                  if (event.key === "ArrowRight") setSelectedIndex(Math.min(points.length - 1, index + 1));
+                  if (event.key === "ArrowLeft") setSelectedIndex(Math.max(0, index - 1));
+                }}
+              />
+            </g>
           ))}
+          <text x={chartPadding} y={chartHeight - 6} className="phase6-chart-extreme">{formatPrice(minimum)}</text>
+          <text x={chartWidth - chartPadding} y={chartHeight - 6} textAnchor="end" className="phase6-chart-extreme">{formatPrice(maximum)}</text>
         </svg>
       </div>
       {selected ? (

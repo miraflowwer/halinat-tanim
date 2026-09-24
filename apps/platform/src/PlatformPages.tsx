@@ -177,7 +177,6 @@ function FarmerDashboard(props: PageProps) {
     <PageFrame {...props}>
       <div className="platform-page stack">
         <section className="page-heading">
-          <p className="eyebrow">{copy.roleFarmer}</p>
           <h1>{copy.welcomeFarmer}, {props.user.display_name}</h1>
           <p>{copy.dashboardFarmerBody}</p>
           <div className="button-row">
@@ -211,6 +210,10 @@ function FarmerDashboard(props: PageProps) {
                         {localizedCropName(language, plan.crop_name_en, plan.crop_name_tl)}
                       </InternalLink>
                       <span>{formatPeriod(plan.harvest_start, plan.harvest_end, language)}</span>
+                      <span className="table-actions">
+                        <InternalLink href={`/prices?crop_id=${encodeURIComponent(plan.crop_id)}`}>{copy.navPrices}</InternalLink>
+                        <InternalLink href={`/map?crop_id=${encodeURIComponent(plan.crop_id)}`}>{copy.navMap}</InternalLink>
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -229,6 +232,10 @@ function FarmerDashboard(props: PageProps) {
                         {localizedCropName(language, plan.crop_name_en, plan.crop_name_tl)}
                       </InternalLink>
                       <span>{plan.geography_name}</span>
+                      <span className="table-actions">
+                        <InternalLink href={`/prices?crop_id=${encodeURIComponent(plan.crop_id)}`}>{copy.navPrices}</InternalLink>
+                        <InternalLink href={`/map?crop_id=${encodeURIComponent(plan.crop_id)}`}>{copy.navMap}</InternalLink>
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -292,7 +299,6 @@ function CooperativeDashboard(props: PageProps) {
     <PageFrame {...props}>
       <div className="platform-page stack">
         <section className="page-heading">
-          <p className="eyebrow">{copy.roleCooperative}</p>
           <h1>{copy.welcomeCooperative}: {overview?.organization_name ?? props.user.display_name}</h1>
           <p>{copy.dashboardCooperativeBody}</p>
         </section>
@@ -588,7 +594,6 @@ function PlanDetailsPage({ planId, ...props }: PageProps & { planId: number }) {
           <section className="content-card stack" aria-labelledby="plan-details-title">
             <div className="split-heading">
               <div className="stack">
-                <p className="eyebrow">{copy.planDetails}</p>
                 <h1 id="plan-details-title">
                   {localizedCropName(language, plan.crop_name_en, plan.crop_name_tl)}
                 </h1>
@@ -787,6 +792,8 @@ function PlanFormPage({ planId, ...props }: PageProps & { planId?: number }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [comparisonSearch, setComparisonSearch] = useState("");
+  const [showAllComparisons, setShowAllComparisons] = useState(false);
 
   async function loadForm() {
     setLoading(true);
@@ -1064,26 +1071,51 @@ function PlanFormPage({ planId, ...props }: PageProps & { planId?: number }) {
             <fieldset className="comparison-fieldset">
               <legend>{copy.comparisons}</legend>
               <p>{copy.comparisonHelp}</p>
+              <p className="muted-text" aria-live="polite">{form.comparison_crop_ids.length}/5 {copy.comparisonSelected}</p>
+              <label>
+                <span>{copy.comparisonSearch}</span>
+                <input
+                  type="search"
+                  value={comparisonSearch}
+                  onChange={(event) => setComparisonSearch(event.target.value)}
+                  placeholder={copy.comparisonSearch}
+                />
+              </label>
               <div className="comparison-options">
-                {crops.filter((crop) => crop.crop_id !== form.crop_id).map((crop) => (
-                  <label className="checkbox-row" key={crop.crop_id}>
-                    <input
-                      type="checkbox"
-                      checked={form.comparison_crop_ids.includes(crop.crop_id)}
-                      disabled={!form.comparison_crop_ids.includes(crop.crop_id) && form.comparison_crop_ids.length >= 5}
-                      onChange={() => toggleComparison(crop.crop_id)}
-                    />
-                    <span>{localizedCropName(language, crop.canonical_name_en, crop.canonical_name_tl)}</span>
-                  </label>
-                ))}
+                {(() => {
+                  const query = comparisonSearch.trim().toLowerCase();
+                  const pool = crops.filter((crop) => crop.crop_id !== form.crop_id).filter((crop) => {
+                    if (!query) return true;
+                    const name = localizedCropName(language, crop.canonical_name_en, crop.canonical_name_tl).toLowerCase();
+                    return name.includes(query) || crop.crop_id.toLowerCase().includes(query);
+                  });
+                  const selected = pool.filter((crop) => form.comparison_crop_ids.includes(crop.crop_id));
+                  const unselected = pool.filter((crop) => !form.comparison_crop_ids.includes(crop.crop_id));
+                  const visible = showAllComparisons ? [...selected, ...unselected] : [...selected, ...unselected.slice(0, Math.max(0, 4 - selected.length))];
+                  return visible.map((crop) => (
+                    <label className="checkbox-row" key={crop.crop_id}>
+                      <input
+                        type="checkbox"
+                        checked={form.comparison_crop_ids.includes(crop.crop_id)}
+                        disabled={!form.comparison_crop_ids.includes(crop.crop_id) && form.comparison_crop_ids.length >= 5}
+                        onChange={() => toggleComparison(crop.crop_id)}
+                      />
+                      <span>{localizedCropName(language, crop.canonical_name_en, crop.canonical_name_tl)}</span>
+                    </label>
+                  ));
+                })()}
               </div>
+              <button className="quiet-button" type="button" onClick={() => setShowAllComparisons((open) => !open)}>
+                {showAllComparisons ? copy.showFewerComparisons : copy.showAllComparisons}
+              </button>
             </fieldset>
 
+            <p className="muted-text">{copy.checkStepsHint}</p>
             <div className="button-row">
-              <button className="secondary-button" disabled={checking || saving} type="button" onClick={() => void checkRisk()}>
+              <button className="primary-button" disabled={checking || saving} type="button" onClick={() => void checkRisk()}>
                 {checking ? copy.checkingRisk : copy.checkRisk}
               </button>
-              <button className="primary-button" disabled={!canSave || checking} type="submit">
+              <button className="secondary-button" disabled={!canSave || checking} type="submit">
                 {saving ? copy.savingPlan : copy.savePlan}
               </button>
               <button className="quiet-button" type="button" onClick={() => navigate("/plans")}>

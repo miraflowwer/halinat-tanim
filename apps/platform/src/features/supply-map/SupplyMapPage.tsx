@@ -260,7 +260,7 @@ export function SupplyMapPage({ language }: { language: Language }) {
               <dl className="phase6-facts">
                 <div><dt>{copy.supplyMap.planned}</dt><dd>{formatArea(selected.planned_context_area_ha, language)}</dd></div>
                 <div><dt>{copy.supplyMap.reference}</dt><dd>{formatArea(selected.reference_context_area_ha, language)}</dd></div>
-                <div><dt>{copy.supplyMap.ratio}</dt><dd>{selected.ratio === null ? copy.supplyMap.noData : selected.ratio.toFixed(6)}</dd></div>
+                <div><dt>{copy.supplyMap.ratio}</dt><dd>{selected.ratio === null ? copy.supplyMap.noData : selected.ratio.toFixed(2)}</dd></div>
                 <div><dt>{copy.supplyMap.status}</dt><dd>{levelLabel(selected.level, language)}</dd></div>
                 <div><dt>{copy.supplyMap.period}</dt><dd>{formatPeriod(mapData, language)}</dd></div>
               </dl>
@@ -287,7 +287,7 @@ export function SupplyMapPage({ language }: { language: Language }) {
                   >
                     <span>{record.name}</span>
                     <span>{levelLabel(record.level, language)}</span>
-                    <span>{record.ratio === null ? copy.supplyMap.noData : record.ratio.toFixed(3)}</span>
+                    <span>{record.ratio === null ? copy.supplyMap.noData : record.ratio.toFixed(2)}</span>
                   </button>
                 </li>
               ))}
