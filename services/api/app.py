@@ -33,6 +33,10 @@ from services.api.demo import (
     DemoService,
     PostgresDemoRepository,
 )
+from services.api.platform_repository import PostgresPlatformRepository
+from services.api.routes.cooperative import router as cooperative_router
+from services.api.routes.lookups import router as lookups_router
+from services.api.routes.plans import router as plans_router
 from services.engine.config import load_engine_config
 from services.engine.models import RiskCheckInput, RiskCheckResult
 from services.engine.periods import EngineInputError
@@ -473,9 +477,9 @@ def _validation_code(errors: list[dict[str, object]]) -> str:
         return "INVALID_ROLE"
     if "privacy_notice_version" in locations:
         return "PRIVACY_NOTICE_VERSION_UNSUPPORTED"
-    if "proposed_area_ha" in locations:
+    if "proposed_area_ha" in locations or "area_ha" in locations:
         return "INVALID_AREA"
-    if "harvest_start" in locations or "harvest_end" in locations:
+    if "harvest_start" in locations or "harvest_end" in locations or "planting_date" in locations:
         return "INVALID_DATE"
     return "INVALID_REQUEST"
 
@@ -489,7 +493,7 @@ async def request_validation_error_handler(_request, exception: RequestValidatio
         "INVALID_PASSWORD": "Enter a password.",
         "INVALID_ROLE": "Choose Farmer or Cooperative.",
         "PRIVACY_NOTICE_VERSION_UNSUPPORTED": "Open the current Privacy Notice and try again.",
-        "INVALID_AREA": "The proposed area must be greater than zero.",
+        "INVALID_AREA": "The area must be greater than zero.",
         "INVALID_DATE": "Use valid ISO dates.",
         "INVALID_REQUEST": "The request is not valid.",
     }
@@ -704,3 +708,11 @@ def risk_check(request: RiskCheckRequest) -> RiskCheckResponse:
             },
         ) from None
     return _risk_response(result)
+
+
+app.state.auth_store_factory = lambda: build_auth_store()
+app.state.platform_repository_factory = PostgresPlatformRepository.from_environment
+app.state.risk_service_factory = lambda: build_risk_service()
+app.include_router(lookups_router)
+app.include_router(plans_router)
+app.include_router(cooperative_router)
