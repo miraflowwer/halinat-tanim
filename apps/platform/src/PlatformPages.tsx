@@ -174,7 +174,6 @@ function FarmerDashboard(props: PageProps) {
     <PageFrame {...props}>
       <div className="platform-page stack">
         <section className="page-heading">
-          <p className="eyebrow">{copy.roleFarmer}</p>
           <h1>{copy.welcomeFarmer}, {props.user.display_name}</h1>
           <p>{copy.dashboardFarmerBody}</p>
           <div className="button-row">
@@ -289,7 +288,6 @@ function CooperativeDashboard(props: PageProps) {
     <PageFrame {...props}>
       <div className="platform-page stack">
         <section className="page-heading">
-          <p className="eyebrow">{copy.roleCooperative}</p>
           <h1>{copy.welcomeCooperative}: {overview?.organization_name ?? props.user.display_name}</h1>
           <p>{copy.dashboardCooperativeBody}</p>
         </section>
@@ -582,7 +580,6 @@ function PlanDetailsPage({ planId, ...props }: PageProps & { planId: number }) {
           <section className="content-card stack" aria-labelledby="plan-details-title">
             <div className="split-heading">
               <div className="stack">
-                <p className="eyebrow">{copy.planDetails}</p>
                 <h1 id="plan-details-title">
                   {localizedCropName(language, plan.crop_name_en, plan.crop_name_tl)}
                 </h1>

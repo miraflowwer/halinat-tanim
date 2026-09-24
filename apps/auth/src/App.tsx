@@ -116,7 +116,6 @@ function PrivacyPage({
   return (
     <AuthShell language={language} onLanguageChange={onLanguageChange}>
       <section className="card stack" aria-labelledby="privacy-title">
-        <p className="eyebrow">TANIM</p>
         <h1 id="privacy-title">{copy.auth.privacyTitle}</h1>
         <p>{copy.auth.privacyIntro}</p>
         <ul className="plain-list">

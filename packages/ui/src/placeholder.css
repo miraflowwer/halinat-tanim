@@ -1,8 +1,15 @@
 :root {
+  --tanim-page: #f4f6ee;
+  --tanim-paper: #fffef9;
+  --tanim-ink: #1a241d;
+  --tanim-field: #185c39;
+  --tanim-field-deep: #102f1f;
+  --tanim-line: #d4e0d6;
+  --tanim-card-radius: 0.875rem;
   font-family: system-ui, sans-serif;
   line-height: 1.5;
-  color: #172018;
-  background: #f7faf7;
+  color: var(--tanim-ink);
+  background: var(--tanim-page);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
 }
@@ -40,6 +47,12 @@ button:disabled {
 
 a {
   color: #185c39;
+  text-underline-offset: 0.15em;
+}
+
+::selection {
+  background: #185c39;
+  color: #fff;
 }
 
 .app-shell {
@@ -104,6 +117,7 @@ select {
   border-radius: 0.35rem;
   background: #fff;
   padding: 0.55rem 0.65rem;
+  caret-color: #185c39;
 }
 
 input[type="checkbox"] {
@@ -115,10 +129,9 @@ input[type="checkbox"] {
 
 .card {
   border: 1px solid #d4e0d6;
-  border-radius: 0.65rem;
-  background: #fff;
+  border-radius: var(--tanim-card-radius);
+  background: var(--tanim-paper);
   padding: clamp(1rem, 4vw, 2rem);
-  box-shadow: 0 0.2rem 0.8rem rgb(23 32 24 / 7%);
 }
 
 .stack {
@@ -131,6 +144,8 @@ h2 {
   max-width: 24ch;
   margin: 0;
   line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
   overflow-wrap: anywhere;
 }
 
@@ -149,17 +164,12 @@ p {
 
 small,
 .muted-text,
-.step-count,
-.eyebrow {
+.step-count {
   color: #53655a;
 }
 
-.eyebrow {
-  margin: 0;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.step-count {
+  font-variant-numeric: tabular-nums;
 }
 
 .plain-list {
@@ -213,7 +223,8 @@ summary {
 }
 
 .form-error {
-  border-left: 0.3rem solid #a63131;
+  border: 1px solid #a63131;
+  border-radius: 0.75rem;
   background: #fff2f2;
   color: #7b2020;
   padding: 0.65rem 0.8rem;
@@ -246,6 +257,7 @@ summary {
 .metric-list dd {
   font-weight: 700;
   text-align: right;
+  font-variant-numeric: tabular-nums;
 }
 
 .user-badge {
@@ -258,6 +270,27 @@ summary {
 :focus-visible {
   outline: 3px solid #185c39;
   outline-offset: 3px;
+}
+
+/* Logbook stamp: the single authored motion. Risk and status marks settle once. */
+@keyframes logbook-stamp {
+  from {
+    transform: scale(1.04);
+    filter: blur(2px);
+  }
+  to {
+    transform: none;
+    filter: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none;
+    transition: none;
+  }
 }
 
 @media (max-width: 42rem) {

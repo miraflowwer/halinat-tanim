@@ -54,8 +54,8 @@
 .phase6-card,
 .phase6-crop-card {
   border: 1px solid #d1ddd4;
-  border-radius: 0.6rem;
-  background: #fff;
+  border-radius: 0.875rem;
+  background: #fffef9;
   padding: clamp(1rem, 3vw, 1.5rem);
 }
 
@@ -167,7 +167,8 @@
 
 .phase6-error,
 .phase6-inline-error {
-  border-left: 0.3rem solid #a63131;
+  border: 1px solid #a63131;
+  border-radius: 0.75rem;
   background: #fff2f2;
   color: #7b2020;
   padding: 0.7rem 0.9rem;
@@ -179,8 +180,10 @@
 }
 
 .phase6-provenance {
-  border-left: 0.2rem solid #637a69;
-  padding-left: 0.75rem;
+  border: 1px solid #d1ddd4;
+  border-radius: 0.75rem;
+  background: #f7faf7;
+  padding: 0.6rem 0.8rem;
   font-size: 0.9rem;
 }
 
@@ -263,10 +266,12 @@
 .phase6-suitability {
   width: fit-content;
   border: 1px solid #88978e;
-  border-radius: 0.35rem;
+  border-radius: 0.75rem;
+  background: var(--phase6-fill, transparent);
   padding: 0.45rem 0.7rem;
   font-size: 1.1rem;
   font-weight: 700;
+  animation: logbook-stamp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .phase6-level-suitable,
@@ -343,14 +348,14 @@
   min-height: 2.8rem;
   align-items: center;
   gap: 0.7rem;
-  border: 1px solid #d1ddd4;
-  border-left: 0.45rem solid #44584a;
-  border-radius: 0.35rem;
+  border: 1px solid #44584a;
+  border-radius: 0.75rem;
   background: var(--phase6-fill, #fff);
   padding: 0.5rem 0.7rem;
   color: #172018;
   text-align: left;
   font: inherit;
+  font-variant-numeric: tabular-nums;
   cursor: pointer;
 }
 
@@ -368,7 +373,7 @@
   align-content: start;
   gap: 0.55rem;
   border: 1px solid #d1ddd4;
-  border-radius: 0.45rem;
+  border-radius: 0.75rem;
   padding: 0.8rem;
 }
 

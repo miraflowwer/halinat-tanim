@@ -92,10 +92,9 @@
 
 .content-card {
   border: 1px solid #d4e0d6;
-  border-radius: 0.65rem;
-  background: #fff;
+  border-radius: 0.875rem;
+  background: #fffef9;
   padding: clamp(1rem, 3vw, 1.5rem);
-  box-shadow: 0 0.15rem 0.6rem rgb(23 32 24 / 5%);
 }
 
 .metric-grid {
@@ -108,8 +107,8 @@
 .metric-card {
   min-width: 0;
   border: 1px solid #d4e0d6;
-  border-radius: 0.45rem;
-  background: #fff;
+  border-radius: 0.75rem;
+  background: #fffef9;
   padding: 0.85rem;
 }
 
@@ -122,6 +121,7 @@
   margin: 0.3rem 0 0;
   font-size: 1.15rem;
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   overflow-wrap: anywhere;
 }
 
@@ -188,7 +188,7 @@
   margin-top: 0.75rem;
   padding: 0.8rem;
   border: 1px solid #b9cbbd;
-  border-radius: 0.4rem;
+  border-radius: 0.75rem;
   background: #f7faf7;
 }
 
@@ -209,7 +209,7 @@
   margin: 0;
   padding: 1rem;
   border: 1px solid #b9cbbd;
-  border-radius: 0.45rem;
+  border-radius: 0.75rem;
 }
 
 .comparison-fieldset legend {
@@ -235,23 +235,24 @@
 .notice-success,
 .notice-warning {
   padding: 0.8rem 1rem;
-  border-radius: 0.35rem;
+  border-radius: 0.75rem;
+  border: 1px solid;
 }
 
 .notice-error {
-  border-left: 0.3rem solid #a63131;
+  border-color: #a63131;
   background: #fff2f2;
   color: #7b2020;
 }
 
 .notice-success {
-  border-left: 0.3rem solid #185c39;
+  border-color: #185c39;
   background: #edf6ee;
   color: #173f2a;
 }
 
 .notice-warning {
-  border-left: 0.3rem solid #9a6b15;
+  border-color: #9a6b15;
   background: #fff8e7;
   color: #62450d;
 }
@@ -275,6 +276,7 @@
   border: 1px solid #b9cbbd;
   border-radius: 999px;
   font-weight: 700;
+  animation: logbook-stamp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .risk-details {
@@ -350,8 +352,8 @@
   .responsive-table tr {
     margin-bottom: 0.8rem;
     border: 1px solid #d4e0d6;
-    border-radius: 0.45rem;
-    background: #fff;
+    border-radius: 0.75rem;
+    background: #fffef9;
   }
 
   .responsive-table td {
@@ -430,8 +432,8 @@
     width: min(18rem, calc(100vw - 1.3rem));
     padding: 0.75rem;
     border: 1px solid #b9cbbd;
-    border-radius: 0.55rem;
-    background: #fff;
+    border-radius: 0.75rem;
+    background: #fffef9;
     box-shadow: 0 0.3rem 1rem rgb(23 32 24 / 14%);
   }
 

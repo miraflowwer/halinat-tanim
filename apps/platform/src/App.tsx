@@ -195,7 +195,6 @@ function DemoView({
       <section className="card stack" aria-labelledby="demo-title">
         <div className="split-heading">
           <div>
-            <p className="eyebrow">{copy.platform.demoTitle}</p>
             <h1 id="demo-title">
               {primary
                 ? localizedCropName(language, primary.crop_name_en, primary.crop_name_tl)
