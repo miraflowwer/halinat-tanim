@@ -21,8 +21,10 @@ REQUIRED_FILES = [
     "requirements/ARCHITECTURE.md",
     "requirements/DATA_SPECIFICATION.md",
     "requirements/PHASE_1_FOUNDATION.md",
+    "requirements/PHASE_4_AUTH_DEMO.md",
     "data/migrations/001_foundation.sql",
     "data/migrations/002_data_foundation.sql",
+    "data/migrations/003_auth_sessions.sql",
     "data/dataset_config.json",
     "data/registry/crops.csv",
     "data/registry/crop_scope_inventory.csv",
@@ -39,9 +41,12 @@ REQUIRED_FILES = [
     "scripts/generate_demo_data.py",
     "scripts/validate_data.py",
     "scripts/seed_data.py",
+    "scripts/seed_demo_accounts.py",
+    "scripts/cleanup_sessions.py",
     "scripts/smoke_api.py",
     "scripts/run-python.mjs",
     "scripts/run-frontends.ps1",
+    "scripts/smoke_auth.py",
     "services/api/app.py",
     "services/engine/__init__.py",
     "tests/test_api_health.py",
@@ -60,6 +65,7 @@ REQUIRED_DIRS = [
     "packages/i18n",
     "packages/types",
     "packages/config",
+    "packages/api-client",
     "data/registry",
     "data/generated",
     "data/seeds",
@@ -112,7 +118,7 @@ for app_name in ["landing", "auth", "platform", "docs"]:
         if not (app_root / relative).is_file():
             missing.append(f"missing file: apps/{app_name}/{relative}")
 
-for package_name in ["ui", "i18n", "types", "config"]:
+for package_name in ["ui", "i18n", "types", "config", "api-client"]:
     package_root = ROOT / "packages" / package_name
     if not (package_root / "package.json").is_file():
         missing.append(f"missing file: packages/{package_name}/package.json")

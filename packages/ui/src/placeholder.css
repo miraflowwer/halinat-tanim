@@ -2,9 +2,13 @@
   font-family: system-ui, sans-serif;
   line-height: 1.5;
   color: #172018;
-  background: #fff;
+  background: #f7faf7;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
@@ -13,38 +17,266 @@ body {
   margin: 0;
 }
 
-main {
-  box-sizing: border-box;
+button,
+input,
+select {
+  font: inherit;
+}
+
+button,
+input,
+select {
+  min-height: 2.75rem;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+a {
+  color: #185c39;
+}
+
+.app-shell {
   width: min(100%, 72rem);
   min-height: 100vh;
   margin-inline: auto;
   padding: clamp(1rem, 5vw, 3rem);
 }
 
-h1 {
-  max-width: 22ch;
-  font-size: clamp(1.75rem, 5vw, 2.5rem);
+.content-column {
+  width: min(100%, 42rem);
+  margin-inline: auto;
+}
+
+.app-header,
+.header-actions,
+.button-row,
+.split-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.app-header,
+.split-heading {
+  justify-content: space-between;
+}
+
+.app-header {
+  margin-bottom: 2rem;
+}
+
+.header-actions {
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.brand-link {
+  color: #172018;
+  font-size: 1.25rem;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+
+.language-control,
+label {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.language-control {
+  min-width: 8rem;
+  font-size: 0.875rem;
+}
+
+input,
+select {
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid #8b9d90;
+  border-radius: 0.35rem;
+  background: #fff;
+  padding: 0.55rem 0.65rem;
+}
+
+input[type="checkbox"] {
+  width: 1.25rem;
+  min-height: 1.25rem;
+  margin: 0.1rem 0 0;
+  accent-color: #185c39;
+}
+
+.card {
+  border: 1px solid #d4e0d6;
+  border-radius: 0.65rem;
+  background: #fff;
+  padding: clamp(1rem, 4vw, 2rem);
+  box-shadow: 0 0.2rem 0.8rem rgb(23 32 24 / 7%);
+}
+
+.stack {
+  display: grid;
+  gap: 1rem;
+}
+
+h1,
+h2 {
+  max-width: 24ch;
+  margin: 0;
   line-height: 1.15;
   overflow-wrap: anywhere;
 }
 
+h1 {
+  font-size: clamp(1.75rem, 5vw, 2.5rem);
+}
+
+h2 {
+  font-size: clamp(1.35rem, 4vw, 1.8rem);
+}
+
 p {
   max-width: 65ch;
+  margin: 0;
 }
 
-label,
-select {
-  display: block;
+small,
+.muted-text,
+.step-count,
+.eyebrow {
+  color: #53655a;
 }
 
-select {
-  min-height: 2.75rem;
-  max-width: 100%;
-  margin-top: 0.35rem;
-  padding-inline: 0.5rem;
+.eyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.plain-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+details {
+  border-block: 1px solid #d4e0d6;
+  padding-block: 0.75rem;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.checkbox-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 0.65rem;
+}
+
+.primary-button,
+.secondary-button,
+.quiet-button {
+  border-radius: 0.35rem;
+  padding: 0.55rem 0.9rem;
+  font-weight: 650;
+}
+
+.primary-button {
+  border: 1px solid #185c39;
+  background: #185c39;
+  color: #fff;
+}
+
+.secondary-button {
+  border: 1px solid #185c39;
+  background: #fff;
+  color: #185c39;
+}
+
+.quiet-button {
+  border: 1px solid transparent;
+  background: transparent;
+  color: #185c39;
+}
+
+.form-error {
+  border-left: 0.3rem solid #a63131;
+  background: #fff2f2;
+  color: #7b2020;
+  padding: 0.65rem 0.8rem;
+}
+
+.link-row {
+  margin-top: 0.25rem;
+}
+
+.metric-list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.metric-list > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+  border-bottom: 1px solid #e2ebe3;
+  padding-bottom: 0.55rem;
+}
+
+.metric-list dt,
+.metric-list dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.metric-list dd {
+  font-weight: 700;
+  text-align: right;
+}
+
+.user-badge {
+  max-width: 14rem;
+  overflow-wrap: anywhere;
+  color: #53655a;
+  font-size: 0.9rem;
 }
 
 :focus-visible {
   outline: 3px solid #185c39;
   outline-offset: 3px;
+}
+
+@media (max-width: 42rem) {
+  .app-header,
+  .split-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .header-actions {
+    justify-content: flex-start;
+  }
+
+  .button-row {
+    align-items: stretch;
+    flex-wrap: wrap;
+  }
+
+  .button-row > button {
+    flex: 1 1 9rem;
+  }
 }
