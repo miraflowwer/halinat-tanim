@@ -135,6 +135,19 @@ These sources support coverage review and naming context. They do not publish th
 - License: no specific data license was stated on the article
 - Transformation: no NCCAG or Bureau of Soils and Water Management location-level suitability layer was selected or used for this dataset. Generated suitability rows are TANIM synthetic demo context and cite the TANIM method identifier only.
 
+## Local supply map geometry
+
+- Source name: geoBoundaries Open Philippines ADM1
+- Boundary ID: `PHL-ADM1-36201628`
+- Boundary year: 2020
+- Source agencies in metadata: National Mapping and Resource Information Authority (NAMRIA), Philippine Statistics Authority (PSA), and OCHA Philippines
+- Resource: [geoBoundaries PHL ADM1 metadata](https://www.geoboundaries.org/api/current/gbOpen/PHL/ADM1/)
+- Geometry: [pre-simplified GeoJSON](https://github.com/wmgeolab/geoBoundaries/raw/41af8f1/releaseData/gbOpen/PHL/ADM1/geoBoundaries-PHL-ADM1_simplified.geojson)
+- Source license in metadata: CC BY 3.0 IGO. geoBoundaries also states that its generated `gbOpen` files are CC BY 4.0. Keep both notices and check the individual source license before reuse outside TANIM.
+- Use in TANIM: local display boundaries for the eight Luzon regions in the current product scope
+- Transformation: selected the eight Luzon region features from the source's already simplified GeoJSON, removed other regions, and added TANIM geography IDs and canonical region names. No boundaries were drawn or edited.
+- Usage status: redistributed in `data/geometry/luzon-regions.geojson` with source attribution. This layer is a local demo display aid, not an official legal map.
+
 ## TANIM synthetic method identifiers
 
 The generated rows use method identifiers when an external source did not directly shape a value:
