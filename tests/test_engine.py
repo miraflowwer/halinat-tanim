@@ -9,7 +9,12 @@ from services.engine.aggregation import aggregate_relevant_plans
 from services.engine.comparisons import calculate_comparison, sort_comparisons
 from services.engine.config import load_engine_config
 from services.engine.explanations import build_available_explanation
-from services.engine.models import PlanRecord
+from services.engine.models import (
+    CropRecord,
+    GeographyRecord,
+    PlanRecord,
+    ReferenceRecord,
+)
 from services.engine.periods import EngineInputError, resolve_supported_period
 from services.engine.risk import (
     calculate_projected_area,
@@ -17,6 +22,7 @@ from services.engine.risk import (
     calculate_risk,
     classify_risk,
 )
+from services.engine.service import RiskService
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -34,6 +40,57 @@ def test_canonical_tomato_fixture_calculates_high_risk():
     assert result.projected_planned_area_ha == Decimal("40")
     assert result.ratio == Decimal("1.6")
     assert result.risk == "high"
+
+
+def test_current_risk_context_uses_active_plans_without_a_proposed_area():
+    class Repository:
+        def dataset_is_ready(self, dataset_version):
+            return True
+
+        def get_crop(self, crop_id):
+            return CropRecord(crop_id, "Tomato")
+
+        def get_geography(self, geography_id):
+            return GeographyRecord(geography_id, 1, "Cabanatuan City")
+
+        def get_plans(self, *_args):
+            return [
+                PlanRecord(
+                    "tomato",
+                    "mun_0304903000",
+                    Decimal("20"),
+                    date(2027, 1, 1),
+                    date(2027, 3, 31),
+                    "active",
+                ),
+                PlanRecord(
+                    "tomato",
+                    "mun_0304903000",
+                    Decimal("99"),
+                    date(2027, 1, 1),
+                    date(2027, 3, 31),
+                    "cancelled",
+                ),
+            ]
+
+        def get_reference(self, *_args):
+            return ReferenceRecord(Decimal("25"), "future_planning", config.dataset_version)
+
+    config = load_engine_config()
+    context = RiskService(Repository(), config).current_context(
+        crop_id="tomato",
+        geography_id="mun_0304903000",
+        harvest_start=date(2027, 1, 1),
+        harvest_end=date(2027, 3, 31),
+    )
+
+    assert context.status == "available"
+    assert context.planned_area_ha == Decimal("20")
+    assert context.reference_area_ha == Decimal("25")
+    assert context.ratio == Decimal("0.8")
+    assert context.risk == "low"
+    assert "20 ha" in context.explanation
+    assert "25 ha reference" in context.explanation
 
 
 def test_eggplant_fixture_calculates_lower_pressure_context():

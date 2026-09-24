@@ -24,6 +24,7 @@
     "smoke:api": "node scripts/run-python.mjs scripts/smoke_api.py",
     "smoke:risk": "node scripts/run-python.mjs scripts/smoke_risk_api.py",
     "smoke:auth": "node scripts/run-python.mjs scripts/smoke_auth.py",
+    "smoke:platform": "node scripts/run-python.mjs scripts/smoke_platform.py",
     "lint:js": "npm run lint --workspaces --if-present",
     "lint:py": "node scripts/run-python.mjs -m ruff check services tests scripts",
     "lint": "npm run lint:js && npm run lint:py"

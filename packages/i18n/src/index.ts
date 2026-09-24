@@ -282,3 +282,5 @@ export const messages: Record<Language, Messages> = {
     },
   },
 };
+
+export { phase5Messages } from "./platform";

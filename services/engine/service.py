@@ -5,8 +5,13 @@ from decimal import Decimal
 from .aggregation import aggregate_relevant_plans
 from .comparisons import calculate_comparison, sort_comparisons
 from .config import EngineConfig
-from .explanations import build_available_explanation, build_unavailable_explanation
-from .models import ComparisonResult, RiskCheckInput, RiskCheckResult
+from .explanations import (
+    build_available_context_explanation,
+    build_available_explanation,
+    build_unavailable_context_explanation,
+    build_unavailable_explanation,
+)
+from .models import ComparisonResult, RiskCheckInput, RiskCheckResult, RiskContextResult
 from .periods import EngineInputError, resolve_supported_period
 from .repository import DatasetNotReadyError, RiskDataRepository
 from .risk import calculate_projected_area, calculate_risk
@@ -137,6 +142,100 @@ class RiskService:
             dataset_version=self.config.dataset_version,
             explanation=explanation,
             comparisons=sort_comparisons(comparisons),
+        )
+
+    def current_context(
+        self,
+        *,
+        crop_id: str,
+        geography_id: str,
+        harvest_start,
+        harvest_end,
+    ) -> RiskContextResult:
+        """Classify all active community plans without adding a proposed plan."""
+        _, _, period = resolve_supported_period(harvest_start, harvest_end, self.config)
+        if not self.repository.dataset_is_ready(self.config.dataset_version):
+            raise DatasetNotReadyError(
+                f"Configured dataset {self.config.dataset_version} is not seeded."
+            )
+
+        crop = self.repository.get_crop(crop_id)
+        if crop is None:
+            raise EngineInputError(
+                "UNSUPPORTED_CROP",
+                "The requested crop is not active or supported.",
+            )
+        geography = self.repository.get_geography(geography_id)
+        if geography is None:
+            raise EngineInputError(
+                "UNSUPPORTED_GEOGRAPHY",
+                "The requested geography is not an active supported municipality or city.",
+            )
+
+        plans = self.repository.get_plans(
+            crop_id,
+            geography.geography_id,
+            geography.database_id,
+            period.start,
+            period.end,
+        )
+        aggregate = aggregate_relevant_plans(
+            plans,
+            crop_id=crop_id,
+            geography_id=geography.geography_id,
+            period_start=period.start,
+            period_end=period.end,
+        )
+        reference = self.repository.get_reference(
+            crop_id,
+            geography.database_id,
+            period.start,
+            period.end,
+            self.config.dataset_version,
+        )
+        reference_area = reference.reference_area_ha if reference else None
+        if _usable_reference(reference_area):
+            calculation = calculate_risk(
+                aggregate.existing_planned_area_ha,
+                Decimal("0"),
+                reference_area,
+                self.config.thresholds,
+            )
+            status = "available"
+            ratio = calculation.ratio
+            risk = calculation.risk
+            safe_reference = reference_area
+            explanation = build_available_context_explanation(
+                crop_name=crop.canonical_name_en,
+                planned_area_ha=aggregate.existing_planned_area_ha,
+                reference_area_ha=reference_area,
+                ratio=ratio,
+                risk=risk,
+            )
+        else:
+            status = "unavailable"
+            ratio = None
+            risk = None
+            safe_reference = None
+            explanation = build_unavailable_context_explanation(
+                crop_name=crop.canonical_name_en,
+                planned_area_ha=aggregate.existing_planned_area_ha,
+            )
+
+        return RiskContextResult(
+            status=status,
+            crop_id=crop_id,
+            geography_id=geography_id,
+            planning_period_start=period.start,
+            planning_period_end=period.end,
+            planned_area_ha=aggregate.existing_planned_area_ha,
+            reference_area_ha=safe_reference,
+            ratio=ratio,
+            risk=risk,
+            contributing_plan_count=aggregate.contributing_plan_count,
+            assumption_version=self.config.assumption_version,
+            dataset_version=self.config.dataset_version,
+            explanation=explanation,
         )
 
     @staticmethod
