@@ -232,6 +232,14 @@ The signature component. A pill with a 1px border that lands with the logbook se
 
 - Style: regions fill with their risk ink and draw a 0.6px map line stroke. Hover and selection deepen the stroke to field deep. Keyboard focus uses the global ring. A text region list mirrors the map so no meaning lives in color alone.
 
+### Surface Shells
+
+Three small shells carry the shared world onto the landing, auth, and docs surfaces. Each one reuses the card, ledger row, and button components above.
+
+- Cover (landing): the logbook cover. A masthead with the brand wordmark, a ruled ledger list of plain facts, and signing actions for entering the app or creating an account. The cover title sets at clamp 2.5rem to 4.5rem with minus 0.03em spacing.
+- Signature consent (auth): the consent line is the signature. The required consent checkbox label carries a 2px ink underline, so agreement reads as signing the logbook. Optional research consent stays a plain checkbox with no underline.
+- Leaflet (docs): one card with ruled sections. Each section after the first takes a 1px rule on top with 1rem of air, so the page reads as one folded leaflet.
+
 ## Do's and Don'ts
 
 Concrete guardrails from the built platform core. They bind new surfaces unless the user changes them.
