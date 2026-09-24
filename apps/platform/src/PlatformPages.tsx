@@ -1134,9 +1134,9 @@ export function ExplorePage(props: PageProps) {
         <h1>{copy.exploreTitle}</h1>
         <p>{copy.exploreBody}</p>
         <ul className="simple-list">
-          <li>{copy.navCrops}<span>{copy.unavailable}</span></li>
-          <li>{copy.navMap}<span>{copy.unavailable}</span></li>
-          <li>{copy.navWeather}<span>{copy.unavailable}</span></li>
+          <li><InternalLink href="/crops">{copy.navCrops}</InternalLink></li>
+          <li><InternalLink href="/map">{copy.navMap}</InternalLink></li>
+          <li><InternalLink href="/weather">{copy.navWeather}</InternalLink></li>
         </ul>
         <InternalLink className="secondary-button" href="/dashboard">{copy.navDashboard}</InternalLink>
       </section>

@@ -98,10 +98,7 @@ describe("documentation content", () => {
     expect(allContent).not.toContain("**");
   });
 
-  it("keeps unmerged phase reconciliation records outside rendered pages", () => {
-    expect(reconciliationItems).toHaveLength(3);
-    expect(reconciliationItems.every((item) => item.marker === "TODO-PHASE-RECONCILE")).toBe(true);
-    const rendered = JSON.stringify({ pages, notFoundCopy });
-    expect(rendered).not.toContain("TODO-PHASE-RECONCILE");
+  it("has no remaining phase reconciliation records after the product audit", () => {
+    expect(reconciliationItems).toHaveLength(0);
   });
 });
