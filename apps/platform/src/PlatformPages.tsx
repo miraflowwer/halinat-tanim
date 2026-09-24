@@ -752,6 +752,10 @@ function RiskPreview({
   );
 }
 
+function asLookupList<T>(payload: T[] | { items: T[] }): T[] {
+  return Array.isArray(payload) ? payload : payload.items;
+}
+
 function PlanFormPage({ planId, ...props }: PageProps & { planId?: number }) {
   const { language } = props;
   const copy = phase5Messages[language];
@@ -775,19 +779,20 @@ function PlanFormPage({ planId, ...props }: PageProps & { planId?: number }) {
     setLoadError(null);
     try {
       const [cropItems, geographyItems, periodItems] = await Promise.all([
-        apiRequest<CropLookup[]>("/crops"),
-        apiRequest<GeographyLookup[]>("/geographies"),
+        apiRequest<CropLookup[] | { items: CropLookup[] }>("/crops"),
+        apiRequest<GeographyLookup[] | { items: GeographyLookup[] }>("/geographies"),
         apiRequest<PlanningPeriod[]>("/planning-periods"),
       ]);
-      setCrops(cropItems);
-      setGeographies(geographyItems);
+      setCrops(asLookupList(cropItems));
+      const geographyList = asLookupList(geographyItems);
+      setGeographies(geographyList);
       setPeriods(periodItems);
       if (planId !== undefined) {
         const plan = await apiRequest<PlantingPlan>(`/plans/${planId}`);
-        const selectedGeography = geographyItems.find(
+        const selectedGeography = geographyList.find(
           (item) => item.geography_id === plan.geography_id,
         );
-        const selectedProvince = geographyItems.find(
+        const selectedProvince = geographyList.find(
           (item) => item.geography_id === selectedGeography?.parent_geography_id,
         );
         const selectedPeriod = periodItems.find((item) =>
