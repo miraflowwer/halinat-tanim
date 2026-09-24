@@ -194,12 +194,23 @@ describe("authenticated platform pages", () => {
     expect(await screen.findByRole("heading", { name: "Wala pang plano" })).toBeTruthy();
   });
 
+  it("shows working context links in Explore", () => {
+    render(<PlatformPage path="/explore" {...commonProps()} />);
+    const explore = screen.getByRole("main");
+
+    expect(explore.querySelector('a[href="/crops"]')).toBeTruthy();
+    expect(explore.querySelector('a[href="/prices"]')).toBeTruthy();
+    expect(explore.querySelector('a[href="/suitability"]')).toBeTruthy();
+    expect(explore.querySelector('a[href="/map"]')).toBeTruthy();
+    expect(explore.querySelector('a[href="/weather"]')).toBeTruthy();
+  });
+
   it("checks risk before saving and clears a preview when form inputs change", async () => {
     const requests: Array<{ path: string; method: string; body: unknown }> = [];
     installApi((path, method, body) => {
       requests.push({ path, method, body });
-      if (path === "/crops") return crops;
-      if (path === "/geographies") return geographies;
+      if (path === "/crops") return { items: crops, total: crops.length, categories: ["vegetable"], dataset_version: "demo-2026-09-v4" };
+      if (path === "/geographies") return { items: geographies, dataset_version: "demo-2026-09-v4" };
       if (path === "/planning-periods") return [period];
       if (path === "/risk/check") return riskResult;
       if (path === "/plans" && method === "POST") {
@@ -252,8 +263,8 @@ describe("authenticated platform pages", () => {
     const requests: Array<{ path: string; method: string }> = [];
     installApi((path, method) => {
       requests.push({ path, method });
-      if (path === "/crops") return crops;
-      if (path === "/geographies") return geographies;
+      if (path === "/crops") return { items: crops, total: crops.length, categories: ["vegetable"], dataset_version: "demo-2026-09-v4" };
+      if (path === "/geographies") return { items: geographies, dataset_version: "demo-2026-09-v4" };
       if (path === "/planning-periods") return [period];
       if (path === "/plans/7") return plan;
       if (path === "/risk/check") return riskResult;

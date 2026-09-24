@@ -318,6 +318,18 @@ export function PlatformApp() {
   const onLanguageChange = (value: Language) => {
     setLanguage(value);
     storeLanguage(value);
+    if (session?.authenticated && session.user.preferred_language !== value) {
+      void apiRequest<{ preferred_language: Language }>("/account/preferences", {
+        method: "PATCH",
+        body: { preferred_language: value },
+      }).then((result) => {
+        setSession((current) => current?.authenticated
+          ? { ...current, user: { ...current.user, preferred_language: result.preferred_language } }
+          : current);
+      }).catch(() => {
+        // The UI remains immediate. A later session restore will show the saved server value.
+      });
+    }
   };
   if (loading) {
     return <main className="app-shell"><p aria-live="polite">{platformCopy.loading}</p></main>;

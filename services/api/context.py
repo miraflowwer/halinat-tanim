@@ -315,14 +315,19 @@ class PostgresContextRepository:
                 filters.append("position(%s in lower(g.name)) > 0")
                 parameters.append(cleaned_search)
             if for_prices:
-                filters.append(
-                    "EXISTS (SELECT 1 FROM price_history ph "
-                    "WHERE ph.geography_id = g.id AND ph.dataset_version = %s "
-                    "AND (%s IS NULL OR ph.crop_id = %s))"
-                )
-                parameters.extend(
-                    [self.configuration.dataset_version, crop_id, crop_id]
-                )
+                if crop_id:
+                    filters.append(
+                        "EXISTS (SELECT 1 FROM price_history ph "
+                        "WHERE ph.geography_id = g.id AND ph.dataset_version = %s "
+                        "AND ph.crop_id = %s)"
+                    )
+                    parameters.extend([self.configuration.dataset_version, crop_id])
+                else:
+                    filters.append(
+                        "EXISTS (SELECT 1 FROM price_history ph "
+                        "WHERE ph.geography_id = g.id AND ph.dataset_version = %s)"
+                    )
+                    parameters.append(self.configuration.dataset_version)
             rows = connection.execute(
                 f"""
                 SELECT DISTINCT g.geography_id, g.name, g.level, g.code,

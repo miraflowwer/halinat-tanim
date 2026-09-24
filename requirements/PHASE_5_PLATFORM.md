@@ -32,8 +32,8 @@ The organization comes from the signed-in user's membership. The overview does n
 
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
-| `GET` | `/crops` | List active crop choices |
-| `GET` | `/geographies` | List active Luzon geography choices |
+| `GET` | `/crops` | List active crop choices using the canonical Phase 6 response `{ items, total, categories, dataset_version }` |
+| `GET` | `/geographies` | List active Luzon geography choices using the canonical Phase 6 response `{ items, dataset_version }` |
 | `GET` | `/planning-periods` | List periods supported by the Phase 3 engine |
 | `GET` | `/plans` | List the signed-in user's plans |
 | `POST` | `/plans` | Create a validated plan |
@@ -47,9 +47,9 @@ The plan endpoints reject inactive crops, unsupported locations, invalid areas o
 
 ## Routes and language
 
-The authenticated platform uses `/dashboard`, `/plans`, `/plans/new`, `/plans/{id}`, `/plans/{id}/edit`, `/settings`, and `/demo`. Cooperative accounts use `/cooperative`. The old `/home` route sends the user to the role-appropriate dashboard.
+The authenticated platform uses `/dashboard`, `/plans`, `/plans/new`, `/plans/{id}`, `/plans/{id}/edit`, `/settings`, `/demo`, `/crops`, `/crops/{crop_id}`, `/prices`, `/suitability`, `/map`, and `/weather`. Cooperative accounts use `/cooperative`. The old `/home` route redirects to `/dashboard` for compatibility.
 
-New platform text is available in English and Tagalog through the shared localization package. English copy uses short, simple sentences. Desktop navigation prepares links for later utilities. Crops, Map, and Weather remain unavailable in Phase 5. Mobile navigation includes Dashboard, Plans, Add Plan, Explore, and Menu.
+New platform text is available in English and Tagalog through the shared localization package. English copy uses short, simple sentences. The Phase 6 utilities use the same authenticated platform shell. Mobile navigation includes Dashboard, Plans, Add Plan, Explore, and Menu.
 
 ## Non-goals
 

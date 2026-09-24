@@ -10,7 +10,8 @@ $targets = @(
     @{ Name = "Platform"; Url = "http://127.0.0.1:3002/"; Kind = "web" },
     @{ Name = "Documentation"; Url = "http://127.0.0.1:3003/"; Kind = "web" },
     @{ Name = "API"; Url = "http://127.0.0.1:8000/health"; Kind = "api" },
-    @{ Name = "Database"; Url = "http://127.0.0.1:8000/health/db"; Kind = "database" }
+    @{ Name = "Database"; Url = "http://127.0.0.1:8000/health/db"; Kind = "database" },
+    @{ Name = "TANIM readiness"; Url = "http://127.0.0.1:8000/health/readiness"; Kind = "readiness" }
 )
 
 $deadline = (Get-Date).AddSeconds($TimeoutSeconds)
@@ -28,9 +29,13 @@ while ((Get-Date) -lt $deadline -and $remaining.Count -gt 0) {
             $healthy = $response.StatusCode -ge 200 -and $response.StatusCode -lt 300
             $kind = ($targets | Where-Object { $_.Name -eq $name } | Select-Object -First 1).Kind
 
-            if ($healthy -and $kind -in @("api", "database")) {
+            if ($healthy -and $kind -in @("api", "database", "readiness")) {
                 $body = $response.Content | ConvertFrom-Json
-                $healthy = $body.status -eq "healthy"
+                $healthy = if ($kind -eq "readiness") {
+                    $body.status -eq "ready"
+                } else {
+                    $body.status -eq "healthy"
+                }
                 if ($kind -eq "database") { $healthy = $healthy -and $body.database -eq "reachable" }
             }
 

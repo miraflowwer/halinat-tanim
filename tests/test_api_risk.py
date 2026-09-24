@@ -1,11 +1,12 @@
 import asyncio
-from datetime import date
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
 import httpx
 import pytest
 
 import services.api.app as api_module
+from services.api.auth import AuthenticatedSession, AuthUser, derive_csrf_token, hash_session_secret
 from services.engine.config import load_engine_config
 from services.engine.models import CropRecord, GeographyRecord, PlanRecord, ReferenceRecord
 from services.engine.service import RiskService
@@ -42,10 +43,39 @@ class InMemoryRiskRepository:
         return self.references.get((crop_id, period_start, period_end))
 
 
-def request(method: str, path: str, **kwargs) -> httpx.Response:
+class InMemoryRiskAuthStore:
+    def __init__(self):
+        session_token = "risk-test-session"
+        csrf_token = derive_csrf_token(session_token)
+        user = AuthUser(
+            1,
+            "Risk Test Farmer",
+            "risk@example.test",
+            "farmer",
+            "en",
+            True,
+        )
+        self.session = AuthenticatedSession(
+            1,
+            user,
+            hash_session_secret(session_token),
+            hash_session_secret(csrf_token),
+            datetime.now(UTC) + timedelta(hours=1),
+            csrf_token,
+        )
+
+    def get_session(self, session_token: str | None, *, rotate_csrf: bool = False):
+        if session_token == "risk-test-session":
+            return self.session
+        return None
+
+
+def request(method: str, path: str, *, authenticated: bool = True, **kwargs) -> httpx.Response:
     async def send_request() -> httpx.Response:
         transport = httpx.ASGITransport(app=api_module.app)
         async with httpx.AsyncClient(transport=transport, base_url="http://test") as client:
+            if authenticated:
+                client.cookies.set("tanim_session", "risk-test-session")
             return await client.request(method, path, **kwargs)
 
     return asyncio.run(send_request())
@@ -109,6 +139,25 @@ def install_in_memory_service(monkeypatch):
         "build_risk_service",
         lambda: RiskService(repository, load_engine_config()),
     )
+    monkeypatch.setattr(api_module.app.state, "auth_store_factory", InMemoryRiskAuthStore)
+
+
+def test_risk_check_rejects_unauthenticated_requests(install_in_memory_service):
+    response = request(
+        "POST",
+        "/risk/check",
+        authenticated=False,
+        json={
+            "crop_id": "tomato",
+            "geography_id": "mun_0304903000",
+            "proposed_area_ha": 8,
+            "harvest_start": "2027-01-15",
+            "harvest_end": "2027-03-15",
+        },
+    )
+
+    assert response.status_code == 401
+    assert response.json()["detail"]["code"] == "UNAUTHENTICATED"
 
 
 def test_risk_check_returns_canonical_tomato_result(install_in_memory_service):

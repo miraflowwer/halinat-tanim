@@ -60,10 +60,10 @@ The demo never inserts rows into `planting_plans`. Completion only sets `users.h
 
 ## Frontend behavior
 
-The auth app provides `/privacy`, `/register`, and `/login`. New registrations and accounts that have not completed the demo go to the platform `/demo` route. Completed accounts go to `/home`. The platform checks the session before showing either route.
+The auth app provides `/privacy`, `/register`, and `/login`. New registrations and accounts that have not completed the demo go to the platform `/demo` route. Completed accounts go to `/dashboard`. The platform checks the session before showing either route.
 
 English and Tagalog are available before login. The selected language is saved locally and is stored in `users.preferred_language` during registration.
 
 ## Non-goals and known limitations
 
-Phase 4 does not provide password recovery, account verification, advanced cooperative administration, planting-plan CRUD, final visual design, or a full authenticated dashboard. The authenticated `/home` route is a functional placeholder until the later platform phase.
+Phase 4 does not provide password recovery, account verification, advanced cooperative administration, planting-plan CRUD, or final visual design. The completed-user redirect is `/dashboard`.

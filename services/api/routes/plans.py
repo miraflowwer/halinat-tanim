@@ -22,13 +22,11 @@ from services.api.platform_repository import (
     PlatformRepositoryError,
     PostgresPlatformRepository,
 )
+from services.api.validation import validate_planning_area
 from services.engine.config import load_engine_config
 from services.engine.periods import EngineInputError, resolve_supported_period
 
 router = APIRouter(tags=["plans"])
-MAX_AREA_HA = Decimal("99999999.9999")
-
-
 class PlanInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -50,11 +48,7 @@ class PlanInput(BaseModel):
     @field_validator("area_ha")
     @classmethod
     def validate_area(cls, value: Decimal) -> Decimal:
-        if not value.is_finite() or value <= 0 or value > MAX_AREA_HA:
-            raise ValueError("area_ha must be a finite supported value greater than zero")
-        if value.as_tuple().exponent < -4:
-            raise ValueError("area_ha can have up to four decimal places")
-        return value
+        return validate_planning_area(value, "area_ha")
 
     @model_validator(mode="after")
     def validate_dates(self):
@@ -102,11 +96,7 @@ class PlanUpdateRequest(BaseModel):
     def validate_area(cls, value: Decimal | None) -> Decimal | None:
         if value is None:
             return None
-        if not value.is_finite() or value <= 0 or value > MAX_AREA_HA:
-            raise ValueError("area_ha must be a finite supported value greater than zero")
-        if value.as_tuple().exponent < -4:
-            raise ValueError("area_ha can have up to four decimal places")
-        return value
+        return validate_planning_area(value, "area_ha")
 
 
 class PlanResponse(BaseModel):

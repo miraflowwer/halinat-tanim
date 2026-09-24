@@ -11,6 +11,7 @@ from services.api.auth import (
     AuthError,
     AuthResult,
     AuthUser,
+    derive_csrf_token,
     hash_session_secret,
     normalize_email,
 )
@@ -29,13 +30,14 @@ class MemoryAuthStore:
         import secrets
 
         token = secrets.token_urlsafe(32)
-        csrf = secrets.token_urlsafe(32)
+        csrf = derive_csrf_token(token)
         session = AuthenticatedSession(
             session_id=len(self.sessions) + 1,
             user=user,
             session_token_hash=hash_session_secret(token),
             csrf_token_hash=hash_session_secret(csrf),
             expires_at=datetime.now(UTC) + SESSION_LIFETIME,
+            csrf_token=csrf,
         )
         self.sessions[session.session_token_hash] = session
         return AuthResult(user, token, csrf)
@@ -81,19 +83,6 @@ class MemoryAuthStore:
         session = self.sessions.get(hash_session_secret(session_token))
         if session is None or session.expires_at <= datetime.now(UTC):
             return None
-        if rotate_csrf:
-            import secrets
-
-            csrf = secrets.token_urlsafe(32)
-            session = AuthenticatedSession(
-                session.session_id,
-                session.user,
-                session.session_token_hash,
-                hash_session_secret(csrf),
-                session.expires_at,
-                csrf,
-            )
-            self.sessions[session.session_token_hash] = session
         return session
 
     def revoke_session(self, session: AuthenticatedSession) -> None:
@@ -172,6 +161,18 @@ def test_registration_requires_current_privacy_consent():
     assert store.users == {}
 
 
+def test_cooperative_registration_requires_an_organization_name():
+    response = request(
+        MemoryAuthStore(),
+        "POST",
+        "/auth/register",
+        json=register_payload(role="cooperative", organization_name=""),
+    )
+
+    assert response.status_code == 422
+    assert response.json()["detail"]["code"] == "COOPERATIVE_ORGANIZATION_REQUIRED"
+
+
 def test_demo_seed_fails_clearly_when_passwords_are_missing(monkeypatch, capsys):
     monkeypatch.setenv("DATABASE_URL", "postgresql://unused@127.0.0.1/unused")
     monkeypatch.setenv("TANIM_DEMO_FARMER_PASSWORD", "")
@@ -199,7 +200,7 @@ def test_login_uses_generic_failure_for_wrong_password_and_unknown_email():
         }
 
 
-def test_session_restoration_returns_csrf_but_not_session_token():
+def test_session_restoration_returns_stable_csrf_but_not_session_token():
     store = MemoryAuthStore()
     original = api_module.build_auth_store
     api_module.build_auth_store = lambda: store
@@ -221,7 +222,7 @@ def test_session_restoration_returns_csrf_but_not_session_token():
     assert restored.json()["authenticated"] is True
     assert restored.json()["csrf_token"]
     assert raw_token not in restored.text
-    assert login.json()["csrf_token"] != restored.json()["csrf_token"]
+    assert login.json()["csrf_token"] == restored.json()["csrf_token"]
 
 
 def test_csrf_blocks_logout_and_logout_only_revokes_current_session():

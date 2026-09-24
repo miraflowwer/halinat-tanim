@@ -95,7 +95,7 @@ export const messages: Record<Language, Messages> = {
       platform: "TANIM workspace",
       docs: "TANIM help and documentation",
     },
-    description: "TANIM helps farmers plan crops with their community. This is a starter page.",
+    description: "TANIM helps farmers plan crops with their community.",
     languageLabel: "Language / Wika",
     languageOptions: { en: "English", tl: "Tagalog" },
     auth: {
@@ -116,8 +116,8 @@ export const messages: Record<Language, Messages> = {
       roleLabel: "Role",
       farmerOption: "Farmer",
       cooperativeOption: "Cooperative",
-      organizationLabel: "Organization name (optional)",
-      organizationHint: "You may add a cooperative or organization name.",
+      organizationLabel: "Organization name",
+      organizationHint: "Cooperative accounts need an organization name.",
       createAccount: "Create account",
       haveAccount: "Already have an account?",
       loginLink: "Log in",
@@ -174,6 +174,7 @@ export const messages: Record<Language, Messages> = {
       INVALID_EMAIL: "Enter a valid email address.",
       INVALID_PASSWORD: "Use at least 8 characters for your password.",
       INVALID_ROLE: "Choose Farmer or Cooperative.",
+      COOPERATIVE_ORGANIZATION_REQUIRED: "Cooperative accounts need an organization name.",
       PRIVACY_CONSENT_REQUIRED: "Accept the required Privacy Notice before creating an account.",
       PRIVACY_NOTICE_VERSION_UNSUPPORTED: "The Privacy Notice changed. Open it again and continue.",
       EMAIL_ALREADY_REGISTERED: "This email is already registered. Try logging in.",
@@ -192,7 +193,7 @@ export const messages: Record<Language, Messages> = {
       docs: "Tulong at gabay sa TANIM",
     },
     description:
-      "Tinutulungan ng TANIM ang mga magsasaka na magplano ng pananim kasama ang komunidad. Panimulang pahina ito.",
+      "Tinutulungan ng TANIM ang mga magsasaka na magplano ng pananim kasama ang komunidad.",
     languageLabel: "Wika / Language",
     languageOptions: { en: "English", tl: "Tagalog" },
     auth: {
@@ -213,8 +214,8 @@ export const messages: Record<Language, Messages> = {
       roleLabel: "Tungkulin",
       farmerOption: "Magsasaka",
       cooperativeOption: "Kooperatiba",
-      organizationLabel: "Pangalan ng organisasyon (opsyonal)",
-      organizationHint: "Maaari kang maglagay ng pangalan ng kooperatiba o organisasyon.",
+      organizationLabel: "Pangalan ng organisasyon",
+      organizationHint: "Kailangan ng pangalan ng organisasyon para sa Kooperatiba.",
       createAccount: "Gumawa ng account",
       haveAccount: "May account ka na?",
       loginLink: "Mag-login",
@@ -271,6 +272,7 @@ export const messages: Record<Language, Messages> = {
       INVALID_EMAIL: "Maglagay ng wastong email address.",
       INVALID_PASSWORD: "Gumamit ng hindi bababa sa 8 character para sa password.",
       INVALID_ROLE: "Pumili ng Magsasaka o Kooperatiba.",
+      COOPERATIVE_ORGANIZATION_REQUIRED: "Kailangan ng pangalan ng organisasyon para sa Kooperatiba.",
       PRIVACY_CONSENT_REQUIRED: "Tanggapin ang kinakailangang Privacy Notice bago gumawa ng account.",
       PRIVACY_NOTICE_VERSION_UNSUPPORTED: "Nagbago ang Privacy Notice. Buksan itong muli at magpatuloy.",
       EMAIL_ALREADY_REGISTERED: "Nakarehistro na ang email na ito. Subukan ang pag-login.",
@@ -284,3 +286,4 @@ export const messages: Record<Language, Messages> = {
 };
 
 export { phase5Messages } from "./platform";
+export { landingMessages } from "./landing";

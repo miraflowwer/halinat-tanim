@@ -29,6 +29,16 @@ export type UnauthenticatedResponse = {
 
 export type SessionResponse = AuthenticatedResponse | UnauthenticatedResponse;
 
+export type OrganizationMembership = {
+  organization_id: number;
+  organization_name: string;
+  join_code: string;
+};
+
+export type AccountMembershipResponse = {
+  membership: OrganizationMembership | null;
+};
+
 export type DemoScenario = {
   scenario_id: string;
   crop_id: string;
@@ -121,12 +131,13 @@ export type PlantingPlanInput = {
 
 export type RiskComparison = {
   crop_id: string;
-  existing_planned_area_ha: number;
+  existing_planned_area_ha: number | null;
   reference_area_ha: number | null;
   current_ratio: number | null;
   current_risk: RiskLevel | null;
   projected_ratio_if_same_area: number | null;
   projected_risk_if_same_area: RiskLevel | null;
+  community_detail_status?: "available" | "limited_for_privacy";
 };
 
 export type RiskCheckResponse = {
@@ -137,9 +148,9 @@ export type RiskCheckResponse = {
   requested_harvest_end: string;
   planning_period_start: string;
   planning_period_end: string;
-  existing_planned_area_ha: number;
+  existing_planned_area_ha: number | null;
   proposed_area_ha: number;
-  projected_planned_area_ha: number;
+  projected_planned_area_ha: number | null;
   reference_area_ha: number | null;
   ratio: number | null;
   risk: RiskLevel | null;
@@ -148,18 +159,20 @@ export type RiskCheckResponse = {
   dataset_version: string;
   explanation: string;
   comparisons: RiskComparison[];
+  community_detail_status?: "available" | "limited_for_privacy";
 };
 
 export type CooperativeRiskContext = {
   status: "available" | "unavailable";
   risk: RiskLevel | null;
-  planned_area_ha: number;
+  planned_area_ha: number | null;
   reference_area_ha: number | null;
   ratio: number | null;
   contributing_plan_count: number;
   assumption_version: string;
   dataset_version: string;
   explanation: string;
+  community_detail_status?: "available" | "limited_for_privacy";
 };
 
 export type CooperativeAggregate = {
@@ -177,6 +190,7 @@ export type CooperativeAggregate = {
 
 export type CooperativeOverview = {
   organization_name: string;
+  organization_join_code?: string | null;
   total_active_plan_count: number;
   total_planned_area_ha: number;
   aggregates: CooperativeAggregate[];

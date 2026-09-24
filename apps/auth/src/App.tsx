@@ -259,7 +259,7 @@ function RegistrationPage({
             {role === "cooperative" ? (
               <label>
                 <span>{copy.auth.organizationLabel}</span>
-                <input value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} />
+                <input required value={organizationName} onChange={(event) => setOrganizationName(event.target.value)} />
                 <small>{copy.auth.organizationHint}</small>
               </label>
             ) : null}
@@ -301,7 +301,7 @@ function LoginPage({
       });
       storeLanguage(result.user.preferred_language);
       window.location.href = result.user.has_completed_demo
-        ? `${frontendUrls.platform}/home`
+        ? `${frontendUrls.platform}/dashboard`
         : `${frontendUrls.platform}/demo`;
     } catch (caught) {
       setError(caught instanceof ApiClientError ? copy.errors[caught.code] ?? caught.message : copy.auth.formError);

@@ -323,6 +323,9 @@ Color must not be the only indicator.
 
 A selected area should expose readable numeric context and a path to details.
 
+The current Supply Map visualization is Region level. It does not replace
+Municipality or City geography used by crop planning and risk checks.
+
 ## 14. Price history
 
 Price history must support:

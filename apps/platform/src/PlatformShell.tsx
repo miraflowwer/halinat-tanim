@@ -74,12 +74,6 @@ export function PlatformShell({
   const copy = phase5Messages[language];
   const [menuOpen, setMenuOpen] = useState(false);
   const roleLabel = user.role === "cooperative" ? copy.roleCooperative : copy.roleFarmer;
-  const unavailable = (label: string) => (
-    <span aria-disabled="true" className="nav-disabled" title={copy.unavailable}>
-      {label}
-    </span>
-  );
-
   return (
     <div className="platform-app-shell">
       <header className="platform-header">
@@ -102,9 +96,9 @@ export function PlatformShell({
       <nav className="desktop-nav" aria-label={copy.navLabel}>
         <InternalLink href="/dashboard">{copy.navDashboard}</InternalLink>
         <InternalLink href="/plans">{copy.navPlans}</InternalLink>
-        {unavailable(copy.navCrops)}
-        {unavailable(copy.navMap)}
-        {unavailable(copy.navWeather)}
+        <InternalLink href="/crops">{copy.navCrops}</InternalLink>
+        <InternalLink href="/map">{copy.navMap}</InternalLink>
+        <InternalLink href="/weather">{copy.navWeather}</InternalLink>
         <a href={frontendUrls.docs} target="_blank" rel="noreferrer">{copy.navHelp}</a>
       </nav>
 
@@ -128,9 +122,9 @@ export function PlatformShell({
         <div id="mobile-menu" className="mobile-menu" aria-label={copy.menuLabel}>
           <InternalLink href="/settings">{copy.navSettings}</InternalLink>
           <a href={frontendUrls.docs} target="_blank" rel="noreferrer">{copy.navHelp}</a>
-          {unavailable(copy.navCrops)}
-          {unavailable(copy.navMap)}
-          {unavailable(copy.navWeather)}
+          <InternalLink href="/crops">{copy.navCrops}</InternalLink>
+          <InternalLink href="/map">{copy.navMap}</InternalLink>
+          <InternalLink href="/weather">{copy.navWeather}</InternalLink>
         </div>
       ) : null}
     </div>

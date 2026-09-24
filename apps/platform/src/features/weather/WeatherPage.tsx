@@ -148,7 +148,9 @@ export function WeatherPage({ language }: { language: Language }) {
                 </li>
               ))}
             </ul>
-            <p className="phase6-help">{copy.weather.attribution}: {provider}</p>
+            <p className="phase6-help">
+              {copy.weather.attribution}: <a href="https://open-meteo.com/" target="_blank" rel="noreferrer">{weather.attribution}</a>
+            </p>
           </section>
           <p className="phase6-provenance">{copy.weather.contextOnly}</p>
         </>

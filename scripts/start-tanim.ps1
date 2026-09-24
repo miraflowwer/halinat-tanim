@@ -196,6 +196,19 @@ function Get-DatabaseUrl {
     return ""
 }
 
+function Get-ConfiguredValue([string]$Name) {
+    $environmentValue = [Environment]::GetEnvironmentVariable($Name)
+    if (-not [string]::IsNullOrWhiteSpace($environmentValue)) { return $environmentValue.Trim() }
+    $envFile = Join-Path $Root ".env"
+    if (-not (Test-Path $envFile)) { return "" }
+    foreach ($line in Get-Content -LiteralPath $envFile) {
+        if ($line -match ("^\s*" + [regex]::Escape($Name) + "\s*=\s*(.*?)\s*$")) {
+            return $Matches[1].Trim().Trim('"').Trim("'")
+        }
+    }
+    return ""
+}
+
 function Get-PostgresEndpoint([string]$DatabaseUrl) {
     if ($DatabaseUrl -match '^\w+://') {
         $uri = [System.Uri]$DatabaseUrl
@@ -288,10 +301,19 @@ $databaseUrl = Get-DatabaseUrl
 if (-not (Check-PostgresAvailability $databaseUrl)) { exit 1 }
 
 $dependencyMarker = $false
-if (-not (Test-Path (Join-Path $Root "node_modules")) -or -not (Test-Path (Join-Path $Root "package-lock.json"))) {
-    if (Ask-YesNo "Frontend dependencies are not installed. Run npm install now?" -DefaultYes $false) {
-        & npm install
-        if ($LASTEXITCODE -ne 0) { throw "npm install failed. Review the output, then retry." }
+$lockfile = Join-Path $Root "package-lock.json"
+$lockFingerprintFile = Join-Path $RuntimeDir "npm-lock.sha256"
+$lockFingerprint = if (Test-Path $lockfile) { (Get-FileHash -Algorithm SHA256 -LiteralPath $lockfile).Hash } else { "" }
+$installedFingerprint = if (Test-Path $lockFingerprintFile) { (Get-Content -Raw -LiteralPath $lockFingerprintFile).Trim() } else { "" }
+$frontendNeedsInstall = -not (Test-Path (Join-Path $Root "node_modules")) -or
+    -not (Test-Path $lockfile) -or
+    [string]::IsNullOrWhiteSpace($installedFingerprint) -or
+    $installedFingerprint -ne $lockFingerprint
+if ($frontendNeedsInstall) {
+    if (Ask-YesNo "Frontend dependencies are missing or do not match package-lock.json. Run npm ci now?" -DefaultYes $false) {
+        & npm ci
+        if ($LASTEXITCODE -ne 0) { throw "npm ci failed. Review the output, then retry." }
+        $lockFingerprint | Set-Content -LiteralPath $lockFingerprintFile -Encoding ASCII
     } else {
         Write-Host "Cannot start TANIM without the local frontend dependencies."
         exit 1
@@ -328,6 +350,26 @@ if (Test-Path $PidFile) {
     Write-Host "A TANIM runtime PID file already exists."
     Write-Host "Run STOP_TANIM.bat, then run TANIM.bat again."
     exit 1
+}
+
+Write-Host "Applying database migrations..."
+& $VenvPython "scripts/init_db.py"
+if ($LASTEXITCODE -ne 0) { throw "Database migrations did not complete. TANIM was not started." }
+
+Write-Host "Seeding the configured TANIM agricultural dataset..."
+& $VenvPython "scripts/seed_data.py"
+if ($LASTEXITCODE -ne 0) { throw "The configured TANIM dataset was not seeded. TANIM was not started." }
+
+$demoFarmerPassword = Get-ConfiguredValue "TANIM_DEMO_FARMER_PASSWORD"
+$demoCoopPassword = Get-ConfiguredValue "TANIM_DEMO_COOP_PASSWORD"
+if (-not [string]::IsNullOrWhiteSpace($demoFarmerPassword) -and
+    -not [string]::IsNullOrWhiteSpace($demoCoopPassword)) {
+    Write-Host "Preparing configured demo accounts..."
+    & $VenvPython "scripts/seed_demo_accounts.py"
+    if ($LASTEXITCODE -ne 0) { throw "Configured demo accounts could not be prepared. TANIM was not started." }
+} else {
+    Write-Host "[NOTICE] Demo account passwords are not both configured. TANIM can run, but demo credentials were not prepared."
+    Write-Host "Set TANIM_DEMO_FARMER_PASSWORD and TANIM_DEMO_COOP_PASSWORD in .env to prepare judge accounts."
 }
 
 $state = @{

@@ -5,6 +5,7 @@ import { frontendUrls } from "@tanim/config";
 import { messages, phase5Messages } from "@tanim/i18n";
 import type {
   AuthUser,
+  AccountMembershipResponse,
   CooperativeAggregate,
   CooperativeOverview,
   CropLookup,
@@ -16,8 +17,10 @@ import type {
   RiskCheckResponse,
   RiskLevel,
 } from "@tanim/types";
+import type { CropListResponse } from "@tanim/types/phase6";
 import { InternalLink, PlatformShell } from "./PlatformShell";
 import { navigate } from "./navigation";
+import { Phase6UtilityRoutes } from "./features/phase6/routes";
 
 type PageProps = {
   language: Language;
@@ -377,14 +380,17 @@ function CooperativeAggregateRow({ item, language }: { item: CooperativeAggregat
     ? language === "tl"
       ? copy.communityRiskExplanation(
         cropName,
-        formatArea(context.planned_area_ha, language),
+        context.planned_area_ha === null ? copy.noRiskScore : formatArea(context.planned_area_ha, language),
         referenceText,
         ratioText,
         riskLabel(context.risk, language),
       )
       : context.explanation
     : language === "tl"
-      ? copy.communityRiskUnavailableExplanation(cropName, formatArea(context.planned_area_ha, language))
+       ? copy.communityRiskUnavailableExplanation(
+         cropName,
+         context.planned_area_ha === null ? copy.noRiskScore : formatArea(context.planned_area_ha, language),
+       )
       : context.explanation;
   return (
     <tr>
@@ -402,8 +408,8 @@ function CooperativeAggregateRow({ item, language }: { item: CooperativeAggregat
         <details className="risk-details">
           <summary>{copy.riskDetails}</summary>
           <p>{explanation}</p>
-          <p>{copy.communityRiskInputs(
-            formatArea(context.planned_area_ha, language),
+           <p>{copy.communityRiskInputs(
+             context.planned_area_ha === null ? copy.noRiskScore : formatArea(context.planned_area_ha, language),
             referenceText,
             context.contributing_plan_count,
           )}</p>
@@ -668,13 +674,14 @@ function RiskPreview({
   };
   const number = (value: number | null) => value === null ? copy.noRiskScore : formatArea(value, language);
   const risk = (value: RiskLevel | null) => value ? riskLabel(value, language) : copy.noRiskScore;
+  const areaText = (value: number | null) => value === null ? copy.noRiskScore : formatArea(value, language);
   const explanation = result.status === "available" && result.risk
     ? language === "tl"
       ? existingCopy.explanation(
         labelForCrop(result.crop_id),
-        formatArea(result.existing_planned_area_ha, language),
+         areaText(result.existing_planned_area_ha),
         formatArea(result.proposed_area_ha, language),
-        formatArea(result.projected_planned_area_ha, language),
+         areaText(result.projected_planned_area_ha),
         result.reference_area_ha === null
           ? copy.referenceNotReady
           : formatArea(result.reference_area_ha, language),
@@ -685,9 +692,9 @@ function RiskPreview({
     : language === "tl"
       ? copy.unavailableRiskExplanation(
         labelForCrop(result.crop_id),
-        formatArea(result.existing_planned_area_ha, language),
+         areaText(result.existing_planned_area_ha),
         formatArea(result.proposed_area_ha, language),
-        formatArea(result.projected_planned_area_ha, language),
+         areaText(result.projected_planned_area_ha),
       )
       : result.explanation;
 
@@ -700,7 +707,9 @@ function RiskPreview({
           <Metric label={copy.ratio} value={result.ratio?.toFixed(2) ?? copy.noRiskScore} />
           <Metric
             label={copy.existingArea}
-            value={`${formatArea(result.existing_planned_area_ha, language)} ${copy.areaUnit}`}
+             value={result.existing_planned_area_ha === null
+               ? copy.noRiskScore
+               : `${formatArea(result.existing_planned_area_ha, language)} ${copy.areaUnit}`}
           />
           <Metric
             label={copy.proposedArea}
@@ -708,7 +717,9 @@ function RiskPreview({
           />
           <Metric
             label={copy.projectedArea}
-            value={`${formatArea(result.projected_planned_area_ha, language)} ${copy.areaUnit}`}
+             value={result.projected_planned_area_ha === null
+               ? copy.noRiskScore
+               : `${formatArea(result.projected_planned_area_ha, language)} ${copy.areaUnit}`}
           />
           <Metric
             label={copy.referenceArea}
@@ -777,11 +788,13 @@ function PlanFormPage({ planId, ...props }: PageProps & { planId?: number }) {
     setLoading(true);
     setLoadError(null);
     try {
-      const [cropItems, geographyItems, periodItems] = await Promise.all([
-        apiRequest<CropLookup[]>("/crops"),
-        apiRequest<GeographyLookup[]>("/geographies"),
+      const [cropResponse, geographyResponse, periodItems] = await Promise.all([
+        apiRequest<CropListResponse>("/crops"),
+        apiRequest<{ items: GeographyLookup[] }>("/geographies"),
         apiRequest<PlanningPeriod[]>("/planning-periods"),
       ]);
+      const cropItems = cropResponse.items;
+      const geographyItems = geographyResponse.items;
       setCrops(cropItems);
       setGeographies(geographyItems);
       setPeriods(periodItems);
@@ -1088,6 +1101,47 @@ function PlanFormPage({ planId, ...props }: PageProps & { planId?: number }) {
 export function SettingsPage(props: PageProps) {
   const { language, user } = props;
   const copy = phase5Messages[language];
+  const [membership, setMembership] = useState<AccountMembershipResponse["membership"]>(null);
+  const [membershipLoading, setMembershipLoading] = useState(true);
+  const [joinCode, setJoinCode] = useState("");
+  const [membershipError, setMembershipError] = useState<string | null>(null);
+  const [joining, setJoining] = useState(false);
+
+  async function loadMembership() {
+    setMembershipLoading(true);
+    setMembershipError(null);
+    try {
+      const result = await apiRequest<AccountMembershipResponse>("/account/membership");
+      setMembership(result.membership);
+    } catch (caught) {
+      setMembershipError(errorMessage(caught, language));
+    } finally {
+      setMembershipLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    void loadMembership();
+  }, []);
+
+  async function joinCooperative(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setJoining(true);
+    setMembershipError(null);
+    try {
+      const result = await apiRequest<AccountMembershipResponse>("/account/membership", {
+        method: "POST",
+        body: { join_code: joinCode },
+      });
+      setMembership(result.membership);
+      setJoinCode("");
+    } catch (caught) {
+      setMembershipError(errorMessage(caught, language));
+    } finally {
+      setJoining(false);
+    }
+  }
+
   return (
     <PageFrame {...props}>
       <div className="platform-page stack">
@@ -1115,6 +1169,33 @@ export function SettingsPage(props: PageProps) {
               <option value="tl">{messages[language].languageOptions.tl}</option>
             </select>
           </label>
+          <section className="stack" aria-labelledby="membership-title">
+            <h2 id="membership-title">{copy.membershipTitle}</h2>
+            {membershipLoading ? <p aria-live="polite">{copy.loading}</p> : null}
+            {membershipError ? <p className="notice-error" role="alert">{membershipError}</p> : null}
+            {!membershipLoading && membership ? (
+              <dl className="plan-summary">
+                <Metric label={copy.cooperativeName} value={membership.organization_name} />
+                <Metric label={copy.cooperativeJoinCode} value={membership.join_code} />
+              </dl>
+            ) : null}
+            {!membershipLoading && !membership && user.role === "farmer" ? (
+              <form className="stack" onSubmit={(event) => void joinCooperative(event)}>
+                <label>
+                  <span>{copy.cooperativeJoinCode}</span>
+                  <input
+                    required
+                    value={joinCode}
+                    onChange={(event) => setJoinCode(event.target.value.toUpperCase())}
+                    placeholder="TANIM-AB12CD"
+                  />
+                </label>
+                <button className="secondary-button" disabled={joining} type="submit">
+                  {joining ? copy.loading : copy.joinCooperative}
+                </button>
+              </form>
+            ) : null}
+          </section>
           <div className="button-row">
             <InternalLink className="secondary-button" href="/demo?replay=1">{copy.replayDemo}</InternalLink>
             <a className="quiet-button" href={frontendUrls.docs} target="_blank" rel="noreferrer">{copy.navHelp}</a>
@@ -1134,9 +1215,11 @@ export function ExplorePage(props: PageProps) {
         <h1>{copy.exploreTitle}</h1>
         <p>{copy.exploreBody}</p>
         <ul className="simple-list">
-          <li>{copy.navCrops}<span>{copy.unavailable}</span></li>
-          <li>{copy.navMap}<span>{copy.unavailable}</span></li>
-          <li>{copy.navWeather}<span>{copy.unavailable}</span></li>
+          <li><InternalLink href="/crops">{copy.navCrops}</InternalLink></li>
+          <li><InternalLink href="/prices">{copy.navPrices}</InternalLink></li>
+          <li><InternalLink href="/suitability">{copy.navSuitability}</InternalLink></li>
+          <li><InternalLink href="/map">{copy.navMap}</InternalLink></li>
+          <li><InternalLink href="/weather">{copy.navWeather}</InternalLink></li>
         </ul>
         <InternalLink className="secondary-button" href="/dashboard">{copy.navDashboard}</InternalLink>
       </section>
@@ -1148,6 +1231,10 @@ export function PlatformPage({
   path,
   ...props
 }: PageProps & { path: string }) {
+  const phase6Route = Phase6UtilityRoutes({ path, language: props.language });
+  if (phase6Route) {
+    return <PageFrame {...props}>{phase6Route}</PageFrame>;
+  }
   if (path === "/plans") return <PlansPage {...props} />;
   if (path === "/plans/new") return <PlanFormPage {...props} />;
   if (/^\/plans\/\d+\/edit$/.test(path)) {

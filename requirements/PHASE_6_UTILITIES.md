@@ -30,7 +30,7 @@ Suitability is not supply pressure. A crop can have suitable soil and still have
 
 `GET /supply-map` requires `crop_id` and accepts `period`. The period is `current` or a supported ISO period start date. The response returns regional planned and reference context, ratio, level, data status, active dataset version, and available periods.
 
-The API aggregates `supply_snapshots` for municipality and city locations to the Luzon region level. These are synthetic context snapshots. They are not registered farmer planting plans. Regional ratios use the configured snapshot thresholds. This is separate from the Phase 3 Glut Risk engine.
+The Supply Map visualization level is Region. The API aggregates `supply_snapshots` for municipality and city locations to the Luzon region level. These are synthetic context snapshots. They are not registered farmer planting plans. Regional ratios use the configured snapshot thresholds. This is separate from the Phase 3 Glut Risk engine. Crop and risk planning can still use Municipality or City geography.
 
 `GET /map-geometry` returns the local eight-region GeoJSON layer. The map uses this file and does not request online tiles. The page also provides a keyboard-accessible region list with text labels and values.
 

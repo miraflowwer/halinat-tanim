@@ -52,6 +52,7 @@ class CooperativePlanRecord:
 class OrganizationRecord:
     organization_id: int
     name: str
+    join_code: str | None = None
 
 
 _PLAN_SELECT = """
@@ -246,23 +247,20 @@ class PostgresPlatformRepository:
             if geography is None:
                 raise PlatformRepositoryError("The selected location is no longer supported.")
 
-            organization_id = None
-            if role == "cooperative":
-                membership = connection.execute(
-                    """
-                    SELECT organization_id
-                    FROM organization_members
-                    WHERE user_id = %s
-                    ORDER BY created_at, organization_id
-                    LIMIT 1
-                    """,
-                    (user_id,),
-                ).fetchone()
-                if membership is None:
-                    raise OrganizationMembershipRequired(
-                        "This Cooperative account has no organization membership."
-                    )
-                organization_id = membership[0]
+            membership = connection.execute(
+                """
+                SELECT organization_id
+                FROM organization_members
+                WHERE user_id = %s
+                LIMIT 1
+                """,
+                (user_id,),
+            ).fetchone()
+            organization_id = membership[0] if membership else None
+            if role == "cooperative" and organization_id is None:
+                raise OrganizationMembershipRequired(
+                    "This Cooperative account has no organization membership."
+                )
 
             inserted = connection.execute(
                 """
@@ -383,11 +381,10 @@ class PostgresPlatformRepository:
         ) -> tuple[OrganizationRecord, list[CooperativePlanRecord]] | None:
             membership = connection.execute(
                 """
-                SELECT o.id, o.name
+                SELECT o.id, o.name, o.join_code
                 FROM organization_members AS om
                 JOIN organizations AS o ON o.id = om.organization_id
                 WHERE om.user_id = %s
-                ORDER BY om.created_at, o.id
                 LIMIT 1
                 """,
                 (user_id,),
@@ -424,7 +421,7 @@ class PostgresPlatformRepository:
                 )
                 for row in rows
             ]
-            return OrganizationRecord(membership[0], membership[1]), plans
+            return OrganizationRecord(membership[0], membership[1], membership[2]), plans
 
         return self._run(operation)
 

@@ -15,6 +15,7 @@ from .models import ComparisonResult, RiskCheckInput, RiskCheckResult, RiskConte
 from .periods import EngineInputError, resolve_supported_period
 from .repository import DatasetNotReadyError, RiskDataRepository
 from .risk import calculate_projected_area, calculate_risk
+from .validation import validate_engine_planning_area
 
 MAX_COMPARISON_CROPS = 5
 
@@ -247,11 +248,7 @@ class RiskService:
                 "INVALID_AREA",
                 "proposed_area_ha must be a finite number greater than zero.",
             ) from None
-        if not proposed.is_finite() or proposed <= 0:
-            raise EngineInputError(
-                "INVALID_AREA",
-                "proposed_area_ha must be a finite number greater than zero.",
-            )
+        proposed = validate_engine_planning_area(proposed)
         comparisons = request.comparison_crop_ids
         if len(comparisons) > MAX_COMPARISON_CROPS:
             raise EngineInputError(
@@ -316,6 +313,7 @@ class RiskService:
                     reference_area if _usable_reference(reference_area) else None,
                     proposed_area,
                     self.config.thresholds,
+                    aggregate.contributing_plan_count,
                 )
             )
         return result

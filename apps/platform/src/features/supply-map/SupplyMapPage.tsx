@@ -11,6 +11,7 @@ import type {
   SupplyMapResponse,
 } from "@tanim/types/phase6";
 import type { Language } from "@tanim/types";
+import { InternalLink } from "../../PlatformShell";
 import { FeaturePage, RequestState, useApiData } from "../phase6/shared";
 import "../phase6/phase6.css";
 
@@ -143,6 +144,7 @@ export function SupplyMapPage({ language }: { language: Language }) {
     () => new URLSearchParams(window.location.search).get("crop_id") ?? "",
   );
   const [period, setPeriod] = useState("current");
+  const [levelFilter, setLevelFilter] = useState<SupplyMapLevel | "all">("all");
   const [selectedId, setSelectedId] = useState("");
   const { data: cropData, loading: cropsLoading, error: cropsError, retry: retryCrops } =
     useApiData<CropListResponse>("/crops?limit=100", language);
@@ -161,19 +163,23 @@ export function SupplyMapPage({ language }: { language: Language }) {
     error: geometryError,
     retry: retryGeometry,
   } = useApiData<LuzonRegionGeometry>(geometryPath, language);
-  const selected = mapData?.items.find((item) => item.geography_id === selectedId)
-    ?? mapData?.items[0]
+  const filteredRecords = useMemo(
+    () => (mapData?.items ?? []).filter((item) => levelFilter === "all" || item.level === levelFilter),
+    [levelFilter, mapData],
+  );
+  const selected = filteredRecords.find((item) => item.geography_id === selectedId)
+    ?? filteredRecords[0]
     ?? null;
 
   useEffect(() => {
-    if (mapData?.items.length && !mapData.items.some((item) => item.geography_id === selectedId)) {
-      setSelectedId(mapData.items[0].geography_id);
+    if (filteredRecords.length && !filteredRecords.some((item) => item.geography_id === selectedId)) {
+      setSelectedId(filteredRecords[0].geography_id);
     }
-  }, [mapData, selectedId]);
+  }, [filteredRecords, selectedId]);
 
   const orderedRecords = useMemo(
-    () => [...(mapData?.items ?? [])].sort((left, right) => left.name.localeCompare(right.name)),
-    [mapData],
+    () => [...filteredRecords].sort((left, right) => left.name.localeCompare(right.name)),
+    [filteredRecords],
   );
 
   return (
@@ -187,6 +193,20 @@ export function SupplyMapPage({ language }: { language: Language }) {
                 {crop.canonical_name_en}{crop.canonical_name_tl ? ` / ${crop.canonical_name_tl}` : ""}
               </option>
             ))}
+          </select>
+        </div>
+        <div className="phase6-control">
+          <label htmlFor="supply-level">{copy.supplyMap.levelLabel}</label>
+          <select
+            id="supply-level"
+            value={levelFilter}
+            onChange={(event) => setLevelFilter(event.target.value as SupplyMapLevel | "all")}
+          >
+            <option value="all">{copy.supplyMap.allLevels}</option>
+            <option value="low">{copy.supplyMap.low}</option>
+            <option value="moderate">{copy.supplyMap.moderate}</option>
+            <option value="high">{copy.supplyMap.high}</option>
+            <option value="no_data">{copy.supplyMap.noData}</option>
           </select>
         </div>
         <div className="phase6-control">
@@ -226,7 +246,7 @@ export function SupplyMapPage({ language }: { language: Language }) {
             <section className="phase6-card stack" aria-label={copy.supplyMap.mapLabel}>
               <LuzonMap
                 geometry={geometry}
-                records={mapData.items}
+                records={filteredRecords}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
                 language={language}
@@ -244,6 +264,14 @@ export function SupplyMapPage({ language }: { language: Language }) {
                 <div><dt>{copy.supplyMap.status}</dt><dd>{levelLabel(selected.level, language)}</dd></div>
                 <div><dt>{copy.supplyMap.period}</dt><dd>{formatPeriod(mapData, language)}</dd></div>
               </dl>
+              <div className="button-row">
+                <InternalLink className="phase6-button" href={`/crops/${encodeURIComponent(mapData.crop_id)}`}>
+                  {copy.supplyMap.viewCrop}
+                </InternalLink>
+                <InternalLink className="phase6-button" href={`/prices?crop_id=${encodeURIComponent(mapData.crop_id)}&geography_id=${encodeURIComponent(selected.geography_id)}`}>
+                  {copy.supplyMap.viewPrices}
+                </InternalLink>
+              </div>
             </section>
           ) : null}
           <section id="supply-map-regions" className="phase6-card stack" aria-labelledby="supply-region-list-title">
@@ -264,6 +292,7 @@ export function SupplyMapPage({ language }: { language: Language }) {
                 </li>
               ))}
             </ul>
+            {orderedRecords.length === 0 ? <p role="status">{copy.supplyMap.noData}</p> : null}
           </section>
         </>
       ) : null}

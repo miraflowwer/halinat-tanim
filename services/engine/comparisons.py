@@ -13,6 +13,7 @@ def calculate_comparison(
     reference_area_ha: Decimal | None,
     proposed_area_ha: Decimal,
     thresholds: RiskThresholds = ENGINE_THRESHOLDS,
+    contributing_plan_count: int = 0,
 ) -> ComparisonResult:
     """Calculate current and hypothetical same-area pressure for one crop."""
     if reference_area_ha is None or reference_area_ha <= 0:
@@ -24,6 +25,7 @@ def calculate_comparison(
             current_risk=None,
             projected_ratio_if_same_area=None,
             projected_risk_if_same_area=None,
+            contributing_plan_count=contributing_plan_count,
         )
 
     current_ratio = calculate_ratio(existing_planned_area_ha, reference_area_ha)
@@ -41,6 +43,7 @@ def calculate_comparison(
         current_risk=classify_risk(current_ratio, thresholds),
         projected_ratio_if_same_area=projected.ratio,
         projected_risk_if_same_area=projected.risk,
+        contributing_plan_count=contributing_plan_count,
     )
 
 

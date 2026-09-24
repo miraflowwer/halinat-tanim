@@ -10,7 +10,14 @@ from fastapi import FastAPI, HTTPException, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict, Field, field_serializer, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_serializer,
+    field_validator,
+    model_validator,
+)
 
 from services.api.auth import (
     AuthenticatedSession,
@@ -34,10 +41,12 @@ from services.api.demo import (
     DemoService,
     PostgresDemoRepository,
 )
+from services.api.dependencies import AUTHENTICATED_SESSION
 from services.api.platform_repository import PostgresPlatformRepository
 from services.api.routes.cooperative import router as cooperative_router
 from services.api.routes.lookups import router as lookups_router
 from services.api.routes.plans import router as plans_router
+from services.api.validation import validate_planning_area
 from services.engine.config import load_engine_config
 from services.engine.models import RiskCheckInput, RiskCheckResult
 from services.engine.periods import EngineInputError
@@ -49,6 +58,7 @@ from services.engine.repository import (
 from services.engine.service import RiskService
 
 logger = logging.getLogger(__name__)
+LATEST_MIGRATION_NAME = "005_membership_preferences_join_codes.sql"
 app = FastAPI(title="TANIM API", version="0.2.0")
 app.add_middleware(
     CORSMiddleware,
@@ -90,9 +100,7 @@ class RiskCheckRequest(BaseModel):
     @field_validator("proposed_area_ha")
     @classmethod
     def area_must_be_positive_and_finite(cls, value: Decimal) -> Decimal:
-        if not value.is_finite() or value <= 0:
-            raise ValueError("proposed_area_ha must be a finite number greater than zero")
-        return value
+        return validate_planning_area(value, "proposed_area_ha")
 
     @field_validator("comparison_crop_ids")
     @classmethod
@@ -137,12 +145,38 @@ class RegisterRequest(BaseModel):
     def optional_text_must_be_cleaned(cls, value: str | None) -> str | None:
         return value.strip() if value and value.strip() else None
 
+    @model_validator(mode="after")
+    def cooperative_must_have_organization(self):
+        if self.role == "cooperative" and not self.organization_name:
+            raise ValueError("organization_name is required for Cooperative accounts")
+        return self
+
 
 class LoginRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     email: str = Field(min_length=1, max_length=320)
     password: str = Field(min_length=1, max_length=256)
+
+
+class PreferredLanguageRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    preferred_language: Literal["en", "tl"]
+
+
+class JoinOrganizationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    join_code: str = Field(min_length=1, max_length=40)
+
+    @field_validator("join_code")
+    @classmethod
+    def clean_join_code(cls, value: str) -> str:
+        cleaned = value.strip().upper()
+        if not cleaned:
+            raise ValueError("join_code must not be blank")
+        return cleaned
 
 
 class UserResponse(BaseModel):
@@ -227,12 +261,13 @@ class DemoResponse(BaseModel):
 
 class ComparisonResponse(BaseModel):
     crop_id: str
-    existing_planned_area_ha: Decimal
+    existing_planned_area_ha: Decimal | None
     reference_area_ha: Decimal | None
     current_ratio: Decimal | None
     current_risk: Literal["low", "moderate", "high"] | None
     projected_ratio_if_same_area: Decimal | None
     projected_risk_if_same_area: Literal["low", "moderate", "high"] | None
+    community_detail_status: Literal["available", "limited_for_privacy"] = "available"
 
     @field_serializer(
         "existing_planned_area_ha",
@@ -253,9 +288,9 @@ class RiskCheckResponse(BaseModel):
     requested_harvest_end: date
     planning_period_start: date
     planning_period_end: date
-    existing_planned_area_ha: Decimal
+    existing_planned_area_ha: Decimal | None
     proposed_area_ha: Decimal
-    projected_planned_area_ha: Decimal
+    projected_planned_area_ha: Decimal | None
     reference_area_ha: Decimal | None
     ratio: Decimal | None
     risk: Literal["low", "moderate", "high"] | None
@@ -264,6 +299,7 @@ class RiskCheckResponse(BaseModel):
     dataset_version: str
     explanation: str
     comparisons: list[ComparisonResponse]
+    community_detail_status: Literal["available", "limited_for_privacy"]
 
     @field_serializer(
         "existing_planned_area_ha",
@@ -445,6 +481,14 @@ def _demo_response(result: DemoScenarioResult) -> DemoResponse:
 
 
 def _risk_response(result: RiskCheckResult) -> RiskCheckResponse:
+    detail_limited = result.contributing_plan_count < 2
+    detail_status = "limited_for_privacy" if detail_limited else "available"
+    explanation = result.explanation
+    if detail_limited:
+        explanation = (
+            f"{explanation} Community detail is limited because fewer than two "
+            "registered plans contribute to this context."
+        )
     return RiskCheckResponse(
         status=result.status,
         crop_id=result.crop_id,
@@ -453,30 +497,63 @@ def _risk_response(result: RiskCheckResult) -> RiskCheckResponse:
         requested_harvest_end=result.requested_harvest_end,
         planning_period_start=result.planning_period_start,
         planning_period_end=result.planning_period_end,
-        existing_planned_area_ha=result.existing_planned_area_ha,
+        existing_planned_area_ha=(
+            None if detail_limited else result.existing_planned_area_ha
+        ),
         proposed_area_ha=result.proposed_area_ha,
-        projected_planned_area_ha=result.projected_planned_area_ha,
+        projected_planned_area_ha=(
+            None if detail_limited else result.projected_planned_area_ha
+        ),
         reference_area_ha=result.reference_area_ha,
-        ratio=result.ratio,
+        ratio=None if detail_limited else result.ratio,
         risk=result.risk,
         contributing_plan_count=result.contributing_plan_count,
         assumption_version=result.assumption_version,
         dataset_version=result.dataset_version,
-        explanation=result.explanation,
+        explanation=explanation,
         comparisons=[
-            ComparisonResponse(**comparison.__dict__) for comparison in result.comparisons
+            ComparisonResponse(
+                **{
+                    **comparison.__dict__,
+                    "existing_planned_area_ha": (
+                        None
+                        if comparison.contributing_plan_count < 2
+                        else comparison.existing_planned_area_ha
+                    ),
+                    "current_ratio": (
+                        None
+                        if comparison.contributing_plan_count < 2
+                        else comparison.current_ratio
+                    ),
+                    "projected_ratio_if_same_area": (
+                        None
+                        if comparison.contributing_plan_count < 2
+                        else comparison.projected_ratio_if_same_area
+                    ),
+                    "community_detail_status": (
+                        "limited_for_privacy"
+                        if comparison.contributing_plan_count < 2
+                        else "available"
+                    ),
+                }
+            )
+            for comparison in result.comparisons
         ],
+        community_detail_status=detail_status,
     )
 
 
 def _validation_code(errors: list[dict[str, object]]) -> str:
     locations = {str(part) for error in errors for part in error.get("loc", ())}
+    messages = " ".join(str(error.get("msg", "")) for error in errors)
     if "email" in locations:
         return "INVALID_EMAIL"
     if "password" in locations:
         return "INVALID_PASSWORD"
     if "role" in locations:
         return "INVALID_ROLE"
+    if "organization_name" in locations or "organization_name" in messages:
+        return "COOPERATIVE_ORGANIZATION_REQUIRED"
     if "privacy_notice_version" in locations:
         return "PRIVACY_NOTICE_VERSION_UNSUPPORTED"
     if "proposed_area_ha" in locations or "area_ha" in locations:
@@ -494,6 +571,7 @@ async def request_validation_error_handler(_request, exception: RequestValidatio
         "INVALID_EMAIL": "Enter a valid email address.",
         "INVALID_PASSWORD": "Enter a password.",
         "INVALID_ROLE": "Choose Farmer or Cooperative.",
+        "COOPERATIVE_ORGANIZATION_REQUIRED": "Cooperative accounts need an organization name.",
         "PRIVACY_NOTICE_VERSION_UNSUPPORTED": "Open the current Privacy Notice and try again.",
         "INVALID_AREA": "The area must be greater than zero.",
         "INVALID_DATE": "Use valid ISO dates.",
@@ -547,6 +625,106 @@ def database_health() -> dict[str, str]:
     return {"status": "healthy", "database": "reachable"}
 
 
+@app.get("/health/readiness")
+def application_readiness() -> dict[str, object]:
+    """Verify that the local TANIM schema and configured dataset are usable."""
+    database_url = os.getenv("DATABASE_URL", "").strip()
+    if not database_url:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "not_ready",
+                "code": "DATABASE_UNAVAILABLE",
+                "message": "DATABASE_URL is not configured.",
+            },
+        )
+    required_tables = {
+        "users",
+        "organizations",
+        "organization_members",
+        "planting_plans",
+        "crops",
+        "dataset_metadata",
+    }
+    try:
+        dataset_version = load_engine_config().dataset_version
+        with psycopg.connect(database_url, connect_timeout=3) as connection:
+            table_rows = connection.execute(
+                """
+                SELECT table_name
+                FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name = ANY(%s)
+                """,
+                (list(required_tables),),
+            ).fetchall()
+            present_tables = {str(row[0]) for row in table_rows}
+            missing_tables = sorted(required_tables - present_tables)
+            migration_table = connection.execute(
+                """
+                SELECT 1
+                FROM information_schema.tables
+                WHERE table_schema = current_schema()
+                  AND table_name = 'tanim_schema_migrations'
+                """
+            ).fetchone()
+            migration = None
+            if migration_table is not None:
+                migration = connection.execute(
+                    """
+                    SELECT 1
+                    FROM tanim_schema_migrations
+                    WHERE migration_name = %s
+                    LIMIT 1
+                    """,
+                    (LATEST_MIGRATION_NAME,),
+                ).fetchone()
+            dataset = connection.execute(
+                """
+                SELECT 1
+                FROM dataset_metadata
+                WHERE dataset_version = %s AND data_kind = 'synthetic_demo'
+                LIMIT 1
+                """,
+                (dataset_version,),
+            ).fetchone()
+            crop_count = connection.execute(
+                "SELECT count(*) FROM crops WHERE active = TRUE"
+            ).fetchone()[0]
+    except (psycopg.Error, OSError, KeyError, ValueError) as error:
+        logger.warning("Application readiness check failed (%s).", type(error).__name__)
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "not_ready",
+                "code": "APPLICATION_NOT_READY",
+                "message": "TANIM database migrations or data are not ready.",
+            },
+        ) from None
+
+    ready = not missing_tables and migration is not None and dataset is not None and crop_count > 0
+    if not ready:
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "not_ready",
+                "code": "APPLICATION_NOT_READY",
+                "message": "TANIM database migrations or data are not ready.",
+                "missing_tables": missing_tables,
+                "dataset_version": dataset_version,
+                "dataset_seeded": dataset is not None,
+                "active_crop_count": crop_count,
+            },
+        )
+    return {
+        "status": "ready",
+        "database": "ready",
+        "migrations": "ready",
+        "dataset_version": dataset_version,
+        "dataset": "ready",
+    }
+
+
 @app.post("/auth/register")
 def register(request: RegisterRequest):
     try:
@@ -580,7 +758,7 @@ def session(request: Request):
     store = build_auth_store()
     token = request.cookies.get(SESSION_COOKIE_NAME)
     try:
-        current = store.get_session(token, rotate_csrf=True)
+        current = store.get_session(token)
     except AuthError as error:
         _raise_auth_error(error)
     if current is None:
@@ -660,8 +838,52 @@ def demo_complete(request: Request):
     return {"has_completed_demo": completed}
 
 
+@app.patch("/account/preferences")
+def update_account_preferences(
+    request: PreferredLanguageRequest,
+    http_request: Request,
+):
+    store = build_auth_store()
+    current = _authenticated_session(http_request, store)
+    _require_csrf(http_request, current)
+    try:
+        user = store.update_preferred_language(
+            current.user.user_id,
+            request.preferred_language,
+        )
+    except AuthError as error:
+        _raise_auth_error(error)
+    return {"preferred_language": user.preferred_language}
+
+
+@app.get("/account/membership")
+def account_membership(request: Request):
+    store = build_auth_store()
+    current = _authenticated_session(request, store)
+    try:
+        membership = store.get_membership(current.user.user_id)
+    except AuthError as error:
+        _raise_auth_error(error)
+    return {"membership": membership}
+
+
+@app.post("/account/membership")
+def join_account_membership(request: JoinOrganizationRequest, http_request: Request):
+    store = build_auth_store()
+    current = _authenticated_session(http_request, store)
+    _require_csrf(http_request, current)
+    try:
+        membership = store.join_organization(current.user.user_id, request.join_code)
+    except AuthError as error:
+        _raise_auth_error(error)
+    return {"membership": membership}
+
+
 @app.post("/risk/check", response_model=RiskCheckResponse)
-def risk_check(request: RiskCheckRequest) -> RiskCheckResponse:
+def risk_check(
+    request: RiskCheckRequest,
+    _session: AuthenticatedSession = AUTHENTICATED_SESSION,
+) -> RiskCheckResponse:
     try:
         result = build_risk_service().check(
             RiskCheckInput(

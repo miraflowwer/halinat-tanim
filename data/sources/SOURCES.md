@@ -117,6 +117,10 @@ The geographic names and codes were loaded from the public PSGC Cloud API as a s
 
 All generated prices, reference areas, planned areas, supply ratios, and soil suitability labels use `data_kind = synthetic_demo`. PSA, DA, Kew, and PSGC Cloud did not publish those generated values. NCCAG and BSWM suitability layers are not used to create the generated suitability rows. Read the method and unit notes in each generated dataset's `metadata.json`.
 
+## Weather provider note
+
+The prototype uses the public Open-Meteo forecast endpoint for live weather context. Open-Meteo attribution is shown in the product. The free endpoint is intended for non-commercial use; a future commercial deployment must review the provider terms and choose a suitable commercial plan or provider.
+
 ## TANIM crop scope inventory
 
 `data/registry/crop_scope_inventory.csv` records the food-crop coverage decisions for Luzon under the [product crop scope](../../requirements/PRODUCT_REQUIREMENTS.md). It is cross-checked against DA price monitoring and PSA crop reports from Quezon and Benguet. The inventory records aliases, source context, and explicit category exclusions. The latest review added Strawberry, Lemon, Chinese cabbage, and Sweet peas after checking the Benguet reports. A newly identified relevant crop must be added with all required TANIM datasets and a deliberate English and Tagalog profile before it is supported.

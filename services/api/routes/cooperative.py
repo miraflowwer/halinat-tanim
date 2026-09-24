@@ -24,13 +24,14 @@ router = APIRouter(tags=["cooperative"])
 class RiskContextResponse(BaseModel):
     status: Literal["available", "unavailable"]
     risk: Literal["low", "moderate", "high"] | None
-    planned_area_ha: Decimal
+    planned_area_ha: Decimal | None
     reference_area_ha: Decimal | None
     ratio: Decimal | None
     contributing_plan_count: int
     assumption_version: str
     dataset_version: str
     explanation: str
+    community_detail_status: Literal["available", "limited_for_privacy"]
 
     @field_serializer(
         "planned_area_ha",
@@ -61,6 +62,7 @@ class CooperativeAggregateResponse(BaseModel):
 
 class CooperativeOverviewResponse(BaseModel):
     organization_name: str
+    organization_join_code: str | None = None
     total_active_plan_count: int
     total_planned_area_ha: Decimal
     aggregates: list[CooperativeAggregateResponse]
@@ -187,13 +189,31 @@ def cooperative_overview(
                     community_risk=RiskContextResponse(
                         status=context.status,
                         risk=context.risk,
-                        planned_area_ha=context.planned_area_ha,
+                        planned_area_ha=(
+                            None
+                            if context.contributing_plan_count < 2
+                            else context.planned_area_ha
+                        ),
                         reference_area_ha=context.reference_area_ha,
-                        ratio=context.ratio,
+                        ratio=(
+                            None
+                            if context.contributing_plan_count < 2
+                            else context.ratio
+                        ),
                         contributing_plan_count=context.contributing_plan_count,
                         assumption_version=context.assumption_version,
                         dataset_version=context.dataset_version,
-                        explanation=context.explanation,
+                        explanation=(
+                            f"{context.explanation} Community detail is limited because "
+                            "fewer than two registered plans contribute to this context."
+                            if context.contributing_plan_count < 2
+                            else context.explanation
+                        ),
+                        community_detail_status=(
+                            "limited_for_privacy"
+                            if context.contributing_plan_count < 2
+                            else "available"
+                        ),
                     ),
                 )
             )
@@ -209,6 +229,7 @@ def cooperative_overview(
     )
     return CooperativeOverviewResponse(
         organization_name=organization.name,
+        organization_join_code=organization.join_code,
         total_active_plan_count=sum(item.plan_count for item in aggregates),
         total_planned_area_ha=sum(
             (item.planned_area_ha for item in aggregates),

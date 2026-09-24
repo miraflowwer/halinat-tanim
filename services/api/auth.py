@@ -71,6 +71,15 @@ def hash_session_secret(secret: str) -> str:
     return hashlib.sha256(secret.encode("utf-8")).hexdigest()
 
 
+def derive_csrf_token(session_token: str) -> str:
+    """Derive one stable CSRF token from the HttpOnly session secret."""
+    return hmac.new(
+        b"tanim-csrf-v1",
+        session_token.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+
 def verify_csrf_token(session: AuthenticatedSession, csrf_token: str | None) -> bool:
     if not csrf_token:
         return False
@@ -143,7 +152,7 @@ class AuthStore:
     @staticmethod
     def _create_session(connection: Any, user_id: int) -> tuple[str, str]:
         session_token = secrets.token_urlsafe(32)
-        csrf_token = secrets.token_urlsafe(32)
+        csrf_token = derive_csrf_token(session_token)
         expires_at = _utc_now() + SESSION_LIFETIME
         connection.execute(
             """
@@ -206,6 +215,11 @@ class AuthStore:
             ) from None
 
         cleaned_organization = (organization_name or "").strip() or None
+        if role == "cooperative" and cleaned_organization is None:
+            raise AuthError(
+                "COOPERATIVE_ORGANIZATION_REQUIRED",
+                "Cooperative accounts need an organization name.",
+            )
         connection = self._connection()
         try:
             with connection:
@@ -347,27 +361,18 @@ class AuthStore:
                 ).fetchone()
                 if row is None:
                     return None
-                csrf_token = secrets.token_urlsafe(32) if rotate_csrf else None
-                if rotate_csrf and csrf_token:
-                    connection.execute(
-                        """
-                        UPDATE auth_sessions
-                        SET csrf_token_hash = %s, last_seen_at = NOW()
-                        WHERE id = %s
-                        """,
-                        (hash_session_secret(csrf_token), row[0]),
-                    )
-                    csrf_hash = hash_session_secret(csrf_token)
-                else:
-                    connection.execute(
-                        "UPDATE auth_sessions SET last_seen_at = NOW() WHERE id = %s",
-                        (row[0],),
-                    )
-                    csrf_hash = row[2]
+                # Keep the token stable for the lifetime of the session. The
+                # argument remains for compatibility with older callers, but
+                # restoring a session must not invalidate another browser tab.
+                csrf_token = derive_csrf_token(session_token)
+                connection.execute(
+                    "UPDATE auth_sessions SET last_seen_at = NOW() WHERE id = %s",
+                    (row[0],),
+                )
                 return AuthenticatedSession(
                     session_id=int(row[0]),
                     session_token_hash=str(row[1]),
-                    csrf_token_hash=str(csrf_hash),
+                    csrf_token_hash=str(row[2]),
                     expires_at=row[3],
                     user=self._user_from_row(row[4:10]),
                     csrf_token=csrf_token,
@@ -427,6 +432,146 @@ class AuthStore:
             raise AuthError(
                 "DATABASE_UNAVAILABLE",
                 "TANIM could not save demo completion. Check PostgreSQL and retry.",
+                503,
+            ) from None
+        finally:
+            connection.close()
+
+    def update_preferred_language(self, user_id: int, preferred_language: str) -> AuthUser:
+        if preferred_language not in _ALLOWED_LANGUAGES:
+            raise AuthError("INVALID_LANGUAGE", "Choose English or Tagalog.")
+        connection = self._connection()
+        try:
+            with connection:
+                row = connection.execute(
+                    """
+                    UPDATE users
+                    SET preferred_language = %s
+                    WHERE id = %s
+                    RETURNING id, email, display_name, role, preferred_language,
+                              has_completed_demo
+                    """,
+                    (preferred_language, user_id),
+                ).fetchone()
+                if row is None:
+                    raise AuthError("UNAUTHENTICATED", "Please sign in to continue.", 401)
+                return self._user_from_row(row)
+        except AuthError:
+            raise
+        except psycopg.Error as error:
+            logger.warning("Language preference update failed (%s).", type(error).__name__)
+            raise AuthError(
+                "DATABASE_UNAVAILABLE",
+                "TANIM could not save your language preference. Check PostgreSQL and retry.",
+                503,
+            ) from None
+        finally:
+            connection.close()
+
+    def get_membership(self, user_id: int) -> dict[str, Any] | None:
+        connection = self._connection()
+        try:
+            with connection:
+                row = connection.execute(
+                    """
+                    SELECT o.id, o.name, o.join_code
+                    FROM organization_members AS om
+                    JOIN organizations AS o ON o.id = om.organization_id
+                    WHERE om.user_id = %s
+                    """,
+                    (user_id,),
+                ).fetchone()
+                if row is None:
+                    return None
+                return {
+                    "organization_id": int(row[0]),
+                    "organization_name": str(row[1]),
+                    "join_code": str(row[2]),
+                }
+        except psycopg.Error as error:
+            logger.warning("Membership lookup failed (%s).", type(error).__name__)
+            raise AuthError(
+                "DATABASE_UNAVAILABLE",
+                "TANIM could not load cooperative membership. Check PostgreSQL and retry.",
+                503,
+            ) from None
+        finally:
+            connection.close()
+
+    def join_organization(self, user_id: int, join_code: str) -> dict[str, Any]:
+        normalized_code = join_code.strip().upper()
+        if not normalized_code:
+            raise AuthError("INVALID_JOIN_CODE", "Enter a cooperative join code.")
+        connection = self._connection()
+        try:
+            with connection:
+                user = connection.execute(
+                    "SELECT role FROM users WHERE id = %s FOR UPDATE",
+                    (user_id,),
+                ).fetchone()
+                if user is None:
+                    raise AuthError("UNAUTHENTICATED", "Please sign in to continue.", 401)
+                if user[0] != "farmer":
+                    raise AuthError(
+                        "FARMER_ROLE_REQUIRED",
+                        "Only Farmer accounts can join a cooperative.",
+                        403,
+                    )
+                existing = connection.execute(
+                    "SELECT 1 FROM organization_members WHERE user_id = %s LIMIT 1",
+                    (user_id,),
+                ).fetchone()
+                if existing is not None:
+                    raise AuthError(
+                        "MEMBERSHIP_ALREADY_EXISTS",
+                        "This Farmer account already belongs to a cooperative.",
+                        409,
+                    )
+                organization = connection.execute(
+                    """
+                    SELECT id, name, join_code
+                    FROM organizations
+                    WHERE UPPER(join_code) = %s
+                    LIMIT 1
+                    """,
+                    (normalized_code,),
+                ).fetchone()
+                if organization is None:
+                    raise AuthError("INVALID_JOIN_CODE", "That cooperative join code is not valid.")
+                try:
+                    connection.execute(
+                        """
+                        INSERT INTO organization_members (organization_id, user_id)
+                        VALUES (%s, %s)
+                        """,
+                        (organization[0], user_id),
+                    )
+                except psycopg.errors.UniqueViolation:
+                    raise AuthError(
+                        "MEMBERSHIP_ALREADY_EXISTS",
+                        "This Farmer account already belongs to a cooperative.",
+                        409,
+                    ) from None
+                connection.execute(
+                    """
+                    UPDATE planting_plans
+                    SET organization_id = %s, updated_at = NOW()
+                    WHERE user_id = %s AND organization_id IS NULL AND status = 'active'
+                    """,
+                    (organization[0], user_id),
+                )
+                return {
+                    "organization_id": int(organization[0]),
+                    "organization_name": str(organization[1]),
+                    "join_code": str(organization[2]),
+                }
+        except AuthError:
+            raise
+        except psycopg.Error as error:
+            logger.warning("Cooperative join failed (%s).", type(error).__name__)
+            raise AuthError(
+                "DATABASE_UNAVAILABLE",
+                "TANIM could not join the cooperative. Check PostgreSQL and retry.",
                 503,
             ) from None
         finally:

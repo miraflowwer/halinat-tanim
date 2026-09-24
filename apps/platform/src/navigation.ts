@@ -32,6 +32,13 @@ export function resolveProtectedRoute(
     || path === "/plans/new"
     || path === "/settings"
     || path === "/explore"
+    || path === "/crops"
+    || /^\/crops\/[^/]+$/.test(path)
+    || path === "/prices"
+    || path === "/suitability"
+    || path === "/map"
+    || path === "/supply-map"
+    || path === "/weather"
     || /^\/plans\/\d+(\/edit)?$/.test(path);
   return knownPath ? { kind: "render" } : { kind: "redirect", path: "/dashboard" };
 }

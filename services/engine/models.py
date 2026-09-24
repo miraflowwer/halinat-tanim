@@ -65,6 +65,7 @@ class ComparisonResult:
     current_risk: RiskLevel | None
     projected_ratio_if_same_area: Decimal | None
     projected_risk_if_same_area: RiskLevel | None
+    contributing_plan_count: int = 0
 
 
 @dataclass(frozen=True)
